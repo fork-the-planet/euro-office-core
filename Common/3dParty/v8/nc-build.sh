@@ -86,4 +86,5 @@ do
     cp "$work_dir/v8/src/base/$f" "$install_dir/v8/src/base/$f" || abort_op "Failed to install ($f)"
 done
 
-echo "v8 ready!"
+echo "v8 ready! (work dir will be removed)"
+rm -rf "$work_dir"

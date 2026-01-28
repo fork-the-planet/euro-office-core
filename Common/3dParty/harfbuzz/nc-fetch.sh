@@ -27,10 +27,13 @@ else
 fi
 
 echo "Fetching Harfbuzz"
-git clone https://github.com/harfbuzz/harfbuzz.git "$install_dir" \
-    || abort_op "Failed to clone Harfbuzz repo"
+
+mkdir -p "$install_dir" || abort_op "Failed to create harfbuzz directory."
 cd "$install_dir"
-git checkout 894a1f72ee93a1fd8dc1d9218cb3fd8f048be29a || abort_op "Failed to check out 894a1f72ee93a1fd8dc1d9218cb3fd8f048be29a"
+git init || abort_op "Git init failed (harfbuzz)"
+git remote add origin https://github.com/harfbuzz/harfbuzz.git || abort_op "Failed to add harfbuzz remote"
+git fetch --depth 1 origin 894a1f72ee93a1fd8dc1d9218cb3fd8f048be29a || abort_op "Failed to fetch 894a1f72ee93a1fd8dc1d9218cb3fd8f048be29a"
+git checkout FETCH_HEAD || abort_op "Check-out failed (harfbuzz)"
 git apply $patches_dir/harfbuzz.patch || abort_op "Failed to apply harfbuzz.patch"
 
 echo "Harfbuzz ready!"
