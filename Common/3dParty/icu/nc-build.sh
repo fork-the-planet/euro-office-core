@@ -59,6 +59,7 @@ LDFLAGS='-Wl,-rpath,$$ORIGIN' \
 
 make -j10 && make install || abort_op "Build failed"
 
-echo "ICU ready!"
+echo "ICU ready! (work dir will be removed)"
+rm -rf "$work_dir"
 
 exit 0

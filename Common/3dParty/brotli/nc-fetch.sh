@@ -24,9 +24,12 @@ else
 fi
 
 echo "Fetching Brotli"
-git clone https://github.com/google/brotli.git "$install_dir" \
-    || abort_op "Failed to clone Brotli repo"
+
+mkdir -p "$install_dir" || abort_op "Failed to create brotli directory."
 cd "$install_dir"
-git checkout a47d7475063eb223c87632eed806c0070e70da29 || abort_op "Failed to check out a47d7475063eb223c87632eed806c0070e70da29"
+git init || abort_op "Git init failed (brotli)"
+git remote add origin https://github.com/google/brotli.git || abort_op "Failed to add brotli remote"
+git fetch --depth 1 origin a47d7475063eb223c87632eed806c0070e70da29 || abort_op "Failed to fetch a47d7475063eb223c87632eed806c0070e70da29"
+git checkout FETCH_HEAD || abort_op "Check-out failed (brotli)"
 
 echo "Brotli ready!"
