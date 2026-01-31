@@ -2,7 +2,6 @@
 set -e
 
 OPENSSL_DIR="$1"
-INSTALL_DIR="$2"
 
 if [ ! -d "$OPENSSL_DIR" ]; then
   git clone --depth=1 --branch OpenSSL_1_1_1f https://github.com/openssl/openssl.git $OPENSSL_DIR

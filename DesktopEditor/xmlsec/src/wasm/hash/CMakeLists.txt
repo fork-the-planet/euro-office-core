@@ -12,7 +12,6 @@ message( "Fetch and build OpenSSL with Emscripten" )
 set(OPENSSL_ROOT "../3rdParty")
 get_filename_component(OPENSSL_ROOT_ABS "${OPENSSL_ROOT}" ABSOLUTE)
 set(OPENSSL_3RDPARTY_DIR "${OPENSSL_ROOT_ABS}/openssl-wasm")
-set(OPENSSL_INSTALL_DIR "${OPENSSL_ROOT_ABS}/openssl")
 ExternalProject_Add(openssl
     GIT_REPOSITORY https://github.com/openssl/openssl.git
     GIT_TAG OpenSSL_1_1_1f
@@ -20,7 +19,7 @@ ExternalProject_Add(openssl
     SOURCE_DIR ${OPENSSL_3RDPARTY_DIR}
 
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${OPENSSL_3RDPARTY_DIR}" "${OPENSSL_INSTALL_DIR}"
+    BUILD_COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${OPENSSL_3RDPARTY_DIR}"
     INSTALL_COMMAND ""
 )
 
