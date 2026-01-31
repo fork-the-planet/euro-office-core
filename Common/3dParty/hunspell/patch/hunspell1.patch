@@ -1,0 +1,8 @@
+<<<<<<<
+FileMgr& operator=(const FileMgr&) = delete;
+=======
+FileMgr& operator=(const FileMgr&) = delete;
+#ifdef HUNSPELL_WASM_MODULE
+    string_buffer_stream memin;
+#endif
+>>>>>>>

@@ -1,0 +1,9 @@
+<<<<<<<
+#include <fstream>
+=======
+#include <fstream>
+#ifdef HUNSPELL_WASM_MODULE
+#include "string_buffer_stream.h"
+#endif
+
+>>>>>>>
