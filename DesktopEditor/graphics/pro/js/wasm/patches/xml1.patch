@@ -1,0 +1,5 @@
+<<<<<<<
+xmlNop(void)
+=======
+xmlNop(void* context, char* buffer, int len)
+>>>>>>>

@@ -1,0 +1,10 @@
+<<<<<<<
+{
+    UDataMemory tData;
+=======
+{
+    #ifdef BUILDING_WASM_MODULE
+    return NULL;
+    #endif
+    UDataMemory tData;
+>>>>>>>

@@ -1,0 +1,5 @@
+<<<<<<<
+static int xmlGetWarningsDefaultValueThrDef = 1;
+=======
+static int xmlGetWarningsDefaultValueThrDef = 0;
+>>>>>>>
