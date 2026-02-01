@@ -4,7 +4,7 @@ work_dir="$1"
 install_dir="$2"
 icu_major=$3
 icu_minor=$4
-platform_prefix=$5
+fetch_only=${5:-0}
 
 abort_op()
 {
@@ -43,23 +43,25 @@ cp -r icu2/icu4c ./icu
 cp icu2/LICENSE ./
 rm -rf icu2
 
-echo "Building icu"
-mkdir build_linux_x64 || abort_op "Failed to create build dir"
-cd build_linux_x64
-$work_dir/icu/source/configure \
---prefix="$install_dir" \
---enable-rpath \
-CC=gcc \
-CXX=g++ \
-AR=ar \
-RANLIB=ranlib \
-CXXFLAGS="-static-libstdc++ -static-libgcc" \
-LDFLAGS='-Wl,-rpath,$$ORIGIN' \
-|| abort_op "Configure failed"
+if [ "$fetch_only" -eq 0 ]; then
+    echo "Building icu"
+    mkdir build_linux_x64 || abort_op "Failed to create build dir"
+    cd build_linux_x64
+    $work_dir/icu/source/configure \
+    --prefix="$install_dir" \
+    --enable-rpath \
+    CC=gcc \
+    CXX=g++ \
+    AR=ar \
+    RANLIB=ranlib \
+    CXXFLAGS="-static-libstdc++ -static-libgcc" \
+    LDFLAGS='-Wl,-rpath,$$ORIGIN' \
+    || abort_op "Configure failed"
 
-make -j10 && make install || abort_op "Build failed"
+    make -j10 && make install || abort_op "Build failed"
 
-echo "ICU ready! (work dir will be removed)"
-rm -rf "$work_dir"
+    echo "ICU ready! (work dir will be removed)"
+    rm -rf "$work_dir"
+fi
 
 exit 0
