@@ -490,6 +490,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sENVIRONMENT=web,worker"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_Zlib_Malloc','_Zlib_Free','_Zlib_Create','_Zlib_Open','_Zlib_Close','_Zlib_AddFile','_Zlib_RemoveFile','_Zlib_GetPaths','_Zlib_GetFile','_Zlib_Save','_Raster_DecodeFile','_Raster_GetDecodedBuffer','_Raster_GetHeight','_Raster_GetWidth','_Raster_GetStride','_Raster_Destroy','_Raster_EncodeImageData','_Raster_Encode','_Raster_GetEncodedBuffer','_Raster_GetEncodedSize','_Raster_DestroyEncodedData','_Image_GetFormat']"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
+    "--pre-js ${CMAKE_SOURCE_DIR}/wasm/js/zlib.js"
 )
 
 add_dependencies(run_after ${PROJECT_NAME})

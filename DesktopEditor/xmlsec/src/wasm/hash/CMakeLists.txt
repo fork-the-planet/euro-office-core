@@ -113,4 +113,5 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sINITIAL_MEMORY=2MB"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_hash','_hash2']"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
+    "--pre-js ${CMAKE_SOURCE_DIR}/hash_base.js"
 )

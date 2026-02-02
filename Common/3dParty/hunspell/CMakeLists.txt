@@ -97,4 +97,5 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sENVIRONMENT=web,worker"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_Spellchecker_Malloc','_Spellchecker_Free','_Spellchecker_Create','_Spellchecker_Destroy','_Spellchecker_AddDictionary','_Spellchecker_RemoveDicrionary','_Spellchecker_Load','_Spellchecker_Spell','_Spellchecker_Suggest','_Spellchecker_RemoveEngine','_Spellchecker_TotalAllocatedMemory']"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
+    "--pre-js ${CMAKE_SOURCE_DIR}/wasm/js/spell.js"
 )
