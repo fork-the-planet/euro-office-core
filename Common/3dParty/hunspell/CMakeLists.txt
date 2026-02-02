@@ -1,59 +1,76 @@
 cmake_minimum_required(VERSION 3.16)
-project(spell_wasm C CXX)
+project(spell)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXECUTABLE_SUFFIX ".js")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/deploy/spell)
 
-include(ExternalProject)
+# -------------------------------------------------
+# Ensure Emscripten toolchain
+# -------------------------------------------------
+if(NOT EMSCRIPTEN)
+    message(FATAL_ERROR "This project must be built with Emscripten (use emcmake).")
+endif()
 
-message( "Fetch and patch Hunspell" )
-get_filename_component(ROOT_DIR "./" ABSOLUTE)
-ExternalProject_Add(hunspell
-    GIT_REPOSITORY https://github.com/hunspell/hunspell.git
-    GIT_TAG v1.7.2
-    GIT_SHALLOW TRUE
-    SOURCE_DIR hunspell
 
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND bash ${ROOT_DIR}/nc-build.sh hunspell
-    INSTALL_COMMAND ""
+# -------------------------------------------------
+# Pre / Post build scripts
+# -------------------------------------------------
+add_custom_target(run_before ALL
+    COMMAND bash ${CMAKE_SOURCE_DIR}/nc-build.sh "${CMAKE_SOURCE_DIR}/hunspell"
 )
 
-# ---- Sources ----
+# -------------------------------------------------
+# Source files (compile_files_array)
+# -------------------------------------------------
 set(HUNSPELL_SRC
-    hunspell/src/hunspell/affentry.cxx
-    hunspell/src/hunspell/affixmgr.cxx
-    hunspell/src/hunspell/csutil.cxx
-    hunspell/src/hunspell/hashmgr.cxx
-    hunspell/src/hunspell/hunspell.cxx
-    hunspell/src/hunspell/hunzip.cxx
-    hunspell/src/hunspell/phonet.cxx
-    hunspell/src/hunspell/replist.cxx
-    hunspell/src/hunspell/suggestmgr.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/affentry.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/affixmgr.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/csutil.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/hashmgr.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/hunspell.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/hunzip.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/phonet.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/replist.cxx
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/suggestmgr.cxx
 )
 
 set_source_files_properties(${HUNSPELL_SRC} PROPERTIES GENERATED TRUE)
 
+# -------------------------------------------------
+# Wrapper Source files
+# -------------------------------------------------
 set(WRAPPER_SRC
-    wasm/src/filemgr_wrapper_new.cxx
-    wasm/src/base.cpp
+    ${CMAKE_SOURCE_DIR}/wasm/src/filemgr_wrapper_new.cxx
+    ${CMAKE_SOURCE_DIR}/wasm/src/base.cpp
 )
 
-add_executable(spell
+# -------------------------------------------------
+# Executable (WASM module)
+# -------------------------------------------------
+add_executable(${PROJECT_NAME}
     ${HUNSPELL_SRC}
     ${WRAPPER_SRC}
 )
-add_dependencies(spell hunspell)
+add_dependencies(${PROJECT_NAME} run_before)
 
-# ---- Includes ----
-target_include_directories(spell PRIVATE
-    hunspell/src/hunspell
-    wasm/src
+# -------------------------------------------------
+# Output folder
+# -------------------------------------------------
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/deploy
 )
 
-# ---- Defines ----
-target_compile_definitions(spell PRIVATE
+# -------------------------------------------------
+# Include directories
+# -------------------------------------------------
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell
+    ${CMAKE_SOURCE_DIR}/wasm/src
+)
+
+# -------------------------------------------------
+# Defines
+# -------------------------------------------------
+target_compile_definitions(${PROJECT_NAME} PRIVATE
     WIN32
     NDEBUG
     HUNSPELL_STATIC
@@ -61,16 +78,20 @@ target_compile_definitions(spell PRIVATE
     HUNSPELL_WASM_MODULE
 )
 
-# ---- Compile flags ----
-target_compile_options(spell PRIVATE
+# -------------------------------------------------
+# Compiler flags (non -s ones)
+# -------------------------------------------------
+target_compile_options(${PROJECT_NAME} PRIVATE
     -O3
     -fno-exceptions
     #-fno-rtti
     -Wno-unused-command-line-argument
 )
 
-# ---- Linker flags ----
-target_link_options(spell PRIVATE
+# -------------------------------------------------
+# Linker flags (Emscripten -s options)
+# -------------------------------------------------
+target_link_options(${PROJECT_NAME} PRIVATE
     "-sALLOW_MEMORY_GROWTH=1"
     "-sFILESYSTEM=0"
     "-sENVIRONMENT=web,worker"

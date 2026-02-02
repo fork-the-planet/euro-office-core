@@ -11,17 +11,17 @@ if [ ! -d "$HUNSPELL_DIR" ]; then
 fi
 
 ./patch/apply_patch.sh \
-  $SCRIPT_DIR/hunspell/src/hunspell/filemgr.hxx \
+  $HUNSPELL_DIR/src/hunspell/filemgr.hxx \
   $SCRIPT_DIR/patch/hunspell1.patch
 
 ./patch/apply_patch.sh \
-  $SCRIPT_DIR/hunspell/src/hunspell/filemgr.hxx \
+  $HUNSPELL_DIR/src/hunspell/filemgr.hxx \
   $SCRIPT_DIR/patch/hunspell2.patch
 
 ./patch/apply_patch.sh \
-  $SCRIPT_DIR/hunspell/src/hunspell/csutil.cxx \
+  $HUNSPELL_DIR/src/hunspell/csutil.cxx \
   $SCRIPT_DIR/patch/hunspell3.patch
 
 ./patch/apply_patch.sh \
-  $SCRIPT_DIR/hunspell/src/hunspell/atypes.hxx \
+  $HUNSPELL_DIR/src/hunspell/atypes.hxx \
   $SCRIPT_DIR/patch/hunspell4.patch

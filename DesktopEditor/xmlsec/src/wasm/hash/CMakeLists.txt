@@ -1,30 +1,31 @@
 cmake_minimum_required(VERSION 3.16)
-project(engine_wasm C CXX)
+project(engine)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXECUTABLE_SUFFIX ".js")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/deploy)
+set(CMAKE_C_STANDARD 11)
+
+# -------------------------------------------------
+# Ensure Emscripten toolchain
+# -------------------------------------------------
+if(NOT EMSCRIPTEN)
+    message(FATAL_ERROR "This project must be built with Emscripten (use emcmake).")
+endif()
 
 
-include(ExternalProject)
-
-message( "Fetch and build OpenSSL with Emscripten" )
+# -------------------------------------------------
+# Pre / Post build scripts
+# -------------------------------------------------
 set(OPENSSL_ROOT "../3rdParty")
 get_filename_component(OPENSSL_ROOT_ABS "${OPENSSL_ROOT}" ABSOLUTE)
 set(OPENSSL_3RDPARTY_DIR "${OPENSSL_ROOT_ABS}/openssl-wasm")
-ExternalProject_Add(openssl
-    GIT_REPOSITORY https://github.com/openssl/openssl.git
-    GIT_TAG OpenSSL_1_1_1f
-    GIT_SHALLOW TRUE
-    SOURCE_DIR ${OPENSSL_3RDPARTY_DIR}
-
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${OPENSSL_3RDPARTY_DIR}"
-    INSTALL_COMMAND ""
+add_custom_target(run_before ALL
+    COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${OPENSSL_3RDPARTY_DIR}"
 )
 
 
-# ---- Sources (from JSON) ----
+# -------------------------------------------------
+# Source files (compile_files_array)
+# -------------------------------------------------
 set(SRC
     ${OPENSSL_3RDPARTY_DIR}/crypto/sha/keccak1600.c
     ${OPENSSL_3RDPARTY_DIR}/crypto/sha/sha1_one.c
@@ -52,37 +53,59 @@ set(SRC
 
 set_source_files_properties(${SRC} PROPERTIES GENERATED TRUE)
 
-add_executable(engine ${SRC} main.cpp)
-add_dependencies(engine openssl)
+# -------------------------------------------------
+# Executable (WASM module)
+# -------------------------------------------------
+add_executable(${PROJECT_NAME} ${SRC} ${CMAKE_SOURCE_DIR}/main.cpp)
+add_dependencies(${PROJECT_NAME} run_before)
 
+# -------------------------------------------------
+# Output settings
+# -------------------------------------------------
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/deploy
+    SUFFIX ".js"
+)
 
-target_include_directories(engine PRIVATE
-    .
+# -------------------------------------------------
+# Include directories
+# -------------------------------------------------
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}
     ${OPENSSL_3RDPARTY_DIR}/include
 )
 
-target_link_libraries(engine PRIVATE
+# -------------------------------------------------
+# link libraries
+# -------------------------------------------------
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ${OPENSSL_3RDPARTY_DIR}/libcrypto.a
     ${OPENSSL_3RDPARTY_DIR}/libssl.a
 )
 
-# ---- Defines ----
-target_compile_definitions(engine PRIVATE
+# -------------------------------------------------
+# Defines
+# -------------------------------------------------
+target_compile_definitions(${PROJECT_NAME} PRIVATE
     WIN32
     NDEBUG
     OPENSSL_MD2_ENABLED
 )
 
-# ---- Compile flags ----
-target_compile_options(engine PRIVATE
+# -------------------------------------------------
+# Compiler flags (non -s ones)
+# -------------------------------------------------
+target_compile_options(${PROJECT_NAME} PRIVATE
     -O3
     -fno-exceptions
     -fno-rtti
     -Wno-unused-command-line-argument
 )
 
-# ---- Emscripten link flags ----
-target_link_options(engine PRIVATE
+# -------------------------------------------------
+# Linker flags (Emscripten -s options)
+# -------------------------------------------------
+target_link_options(${PROJECT_NAME} PRIVATE
     "-sALLOW_MEMORY_GROWTH=1"
     "-sFILESYSTEM=0"
     "-sENVIRONMENT=worker"
