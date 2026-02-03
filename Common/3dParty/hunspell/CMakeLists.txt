@@ -14,23 +14,23 @@ endif()
 # -------------------------------------------------
 # Pre / Post build scripts
 # -------------------------------------------------
-add_custom_target(run_before ALL
-    COMMAND bash ${CMAKE_SOURCE_DIR}/nc-build.sh "${CMAKE_SOURCE_DIR}/hunspell"
+add_custom_target(${PROJECT_NAME}_run_before ALL
+    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/nc-build.sh "${CMAKE_CURRENT_SOURCE_DIR}/hunspell"
 )
 
 # -------------------------------------------------
 # Source files (compile_files_array)
 # -------------------------------------------------
 set(HUNSPELL_SRC
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/affentry.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/affixmgr.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/csutil.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/hashmgr.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/hunspell.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/hunzip.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/phonet.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/replist.cxx
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell/suggestmgr.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/affentry.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/affixmgr.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/csutil.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/hashmgr.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/hunspell.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/hunzip.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/phonet.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/replist.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/suggestmgr.cxx
 )
 
 set_source_files_properties(${HUNSPELL_SRC} PROPERTIES GENERATED TRUE)
@@ -39,8 +39,8 @@ set_source_files_properties(${HUNSPELL_SRC} PROPERTIES GENERATED TRUE)
 # Wrapper Source files
 # -------------------------------------------------
 set(WRAPPER_SRC
-    ${CMAKE_SOURCE_DIR}/wasm/src/filemgr_wrapper_new.cxx
-    ${CMAKE_SOURCE_DIR}/wasm/src/base.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wasm/src/filemgr_wrapper_new.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/wasm/src/base.cpp
 )
 
 # -------------------------------------------------
@@ -50,21 +50,21 @@ add_executable(${PROJECT_NAME}
     ${HUNSPELL_SRC}
     ${WRAPPER_SRC}
 )
-add_dependencies(${PROJECT_NAME} run_before)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_run_before)
 
 # -------------------------------------------------
 # Output folder
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/deploy
+    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
 )
 
 # -------------------------------------------------
 # Include directories
 # -------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/hunspell/src/hunspell
-    ${CMAKE_SOURCE_DIR}/wasm/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell
+    ${CMAKE_CURRENT_SOURCE_DIR}/wasm/src
 )
 
 # -------------------------------------------------
@@ -97,5 +97,5 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sENVIRONMENT=web,worker"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_Spellchecker_Malloc','_Spellchecker_Free','_Spellchecker_Create','_Spellchecker_Destroy','_Spellchecker_AddDictionary','_Spellchecker_RemoveDicrionary','_Spellchecker_Load','_Spellchecker_Spell','_Spellchecker_Suggest','_Spellchecker_RemoveEngine','_Spellchecker_TotalAllocatedMemory']"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
-    "--pre-js ${CMAKE_SOURCE_DIR}/wasm/js/spell.js"
+    "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/spell.js"
 )

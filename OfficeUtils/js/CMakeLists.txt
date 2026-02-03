@@ -14,25 +14,25 @@ endif()
 # -------------------------------------------------
 # Pre / Post build scripts
 # -------------------------------------------------
-add_custom_target(run_after ALL VERBATIM
+add_custom_target(${PROJECT_NAME}_run_after ALL VERBATIM
     # That doesn't seem to be relevant anymore. I'll leave it there as a comment just to be on the safe side.
     #COMMAND perl -i -0777 -pe
     #        "s/\\Q__ATPOSTRUN__=[]\\E/__ATPOSTRUN__=[function(){self.onZlibEngineInit();}]/g"
-    #        ${CMAKE_SOURCE_DIR}/deploy/zlib.js	
+    #        ${CMAKE_CURRENT_SOURCE_DIR}/deploy/zlib.js	
             
     #COMMAND perl -i -0777 -pe
     #        "s/\\Qfunction getBinaryPromise(){\\E/getBinaryPromise2(){/g"
-    #        ${CMAKE_SOURCE_DIR}/deploy/zlib.js
+    #        ${CMAKE_CURRENT_SOURCE_DIR}/deploy/zlib.js
 
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/wasm/js/index.html ${CMAKE_SOURCE_DIR}/deploy/index.html
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/wasm/js/code.js ${CMAKE_SOURCE_DIR}/deploy/code.js
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/index.html ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}/index.html
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/code.js ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}/code.js
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # -------------------------------------------------
 # Source files (compile_files_array)
 # -------------------------------------------------
-set(CORE_ROOT ${CMAKE_SOURCE_DIR}/../..)
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 set(SRC
     # ---- minizip ----
@@ -55,9 +55,9 @@ set(SRC
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11/compress.c
 
     # ---- project glue ----
-    ./../src/ZipBuffer.cpp
-    ./wasm/src/base.cpp
-    ./../src/zlib_addon.c
+    ${CORE_ROOT}/OfficeUtils/src/ZipBuffer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wasm/src/base.cpp
+    ${CORE_ROOT}/OfficeUtils/src/zlib_addon.c
 
     # ---- raster ----
     ${CORE_ROOT}/DesktopEditor/graphics/Image.cpp
@@ -431,7 +431,7 @@ add_executable(${PROJECT_NAME} ${SRC})
 # Output folder
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/deploy
+    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
 )
 
 # -------------------------------------------------
@@ -490,7 +490,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sENVIRONMENT=web,worker"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_Zlib_Malloc','_Zlib_Free','_Zlib_Create','_Zlib_Open','_Zlib_Close','_Zlib_AddFile','_Zlib_RemoveFile','_Zlib_GetPaths','_Zlib_GetFile','_Zlib_Save','_Raster_DecodeFile','_Raster_GetDecodedBuffer','_Raster_GetHeight','_Raster_GetWidth','_Raster_GetStride','_Raster_Destroy','_Raster_EncodeImageData','_Raster_Encode','_Raster_GetEncodedBuffer','_Raster_GetEncodedSize','_Raster_DestroyEncodedData','_Image_GetFormat']"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
-    "--pre-js ${CMAKE_SOURCE_DIR}/wasm/js/zlib.js"
+    "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/zlib.js"
 )
 
-add_dependencies(run_after ${PROJECT_NAME})
+add_dependencies(${PROJECT_NAME}_run_after ${PROJECT_NAME})

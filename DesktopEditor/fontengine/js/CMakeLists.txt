@@ -11,18 +11,18 @@ if(NOT EMSCRIPTEN)
     message(FATAL_ERROR "Build with Emscripten: emcmake cmake ...")
 endif()
 
-set(CORE_ROOT ${CMAKE_SOURCE_DIR}/../../..)
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
 set(DESKTOP_ROOT ${CORE_ROOT}/DesktopEditor)
 
 # -------------------------------------------------
 # Pre/Post scripts
 # -------------------------------------------------
-add_custom_target(run_before ALL
+add_custom_target(${PROJECT_NAME}_run_before ALL
     COMMAND bash ${CORE_ROOT}/Common/3dParty/brotli/nc-fetch.sh ${CORE_ROOT}/Common/3dParty/brotli/brotli
     COMMAND bash ${CORE_ROOT}/Common/3dParty/harfbuzz/nc-fetch.sh ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz
     COMMAND bash ${CORE_ROOT}/Common/3dParty/hyphen/nc-fetch.sh ${DESKTOP_ROOT}/fontengine/hyphen
     COMMAND bash ${DESKTOP_ROOT}/graphics/pro/js/nc-build.sh
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # -------------------------------------------------
@@ -171,7 +171,7 @@ set(SOURCES
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11/zutil.c
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11/compress.c
 
-    ${CMAKE_SOURCE_DIR}/cpp/text.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/text.cpp
 
     ${DESKTOP_ROOT}/graphics/pro/js/wasm/src/lib/wasm_jmp.cpp
 
@@ -358,7 +358,7 @@ set_source_files_properties(${SOURCES} PROPERTIES GENERATED TRUE)
 # Executable (WASM module)
 # -------------------------------------------------
 add_executable(${PROJECT_NAME} ${SOURCES})
-add_dependencies(${PROJECT_NAME} run_before)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_run_before)
 
 # -------------------------------------------------
 # Include paths
@@ -445,13 +445,13 @@ target_link_options(${PROJECT_NAME} PRIVATE
 -sLLD_REPORT_UNDEFINED
 -sWASM=1
 -sEXPORTED_FUNCTIONS=[${EXPORTED_FUNCS_STR}]
---pre-js ${CMAKE_SOURCE_DIR}/engine/module_js.js
+--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/engine/module_js.js
 )
 
 # -------------------------------------------------
 # Output
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/deploy
+RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
 SUFFIX ".js"
 )

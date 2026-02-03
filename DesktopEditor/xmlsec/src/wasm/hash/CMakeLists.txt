@@ -18,7 +18,7 @@ endif()
 set(OPENSSL_ROOT "../3rdParty")
 get_filename_component(OPENSSL_ROOT_ABS "${OPENSSL_ROOT}" ABSOLUTE)
 set(OPENSSL_3RDPARTY_DIR "${OPENSSL_ROOT_ABS}/openssl-wasm")
-add_custom_target(run_before ALL
+add_custom_target(${PROJECT_NAME}_run_before ALL
     COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${OPENSSL_3RDPARTY_DIR}"
 )
 
@@ -56,14 +56,14 @@ set_source_files_properties(${SRC} PROPERTIES GENERATED TRUE)
 # -------------------------------------------------
 # Executable (WASM module)
 # -------------------------------------------------
-add_executable(${PROJECT_NAME} ${SRC} ${CMAKE_SOURCE_DIR}/main.cpp)
-add_dependencies(${PROJECT_NAME} run_before)
+add_executable(${PROJECT_NAME} ${SRC} ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_run_before)
 
 # -------------------------------------------------
 # Output settings
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/deploy
+    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
     SUFFIX ".js"
 )
 
@@ -71,7 +71,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # Include directories
 # -------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${OPENSSL_3RDPARTY_DIR}/include
 )
 
@@ -113,5 +113,5 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sINITIAL_MEMORY=2MB"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_hash','_hash2']"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
-    "--pre-js ${CMAKE_SOURCE_DIR}/hash_base.js"
+    "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/hash_base.js"
 )
