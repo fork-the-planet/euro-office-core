@@ -30,12 +30,15 @@
  *
  */
 
-//base64
+import createHashModule from "./hash_engine.js";
+
+let ModuleInstance = null;
 
 (function(window, undefined) {
 
 	window.messageData = null;
 	window.messagePort = null;
+
 	function onMessageEvent(data, port)
 	{
 	    if (data.type == "hash")
@@ -55,17 +58,33 @@
 	        onMessageEvent(e.data, port);
 	    }    
 	};
+
 	window.onmessage = function(e)
 	{
 	    onMessageEvent(e.data);
 	};
+
 	window.engineInit = false;
-	window.onEngineInit = function()
+
+	createHashModule(
 	{
+	locateFile: function (path) {
+		if (
+		typeof navigator !== "undefined" &&
+		navigator.userAgent.toLowerCase().includes("ascdesktopeditor") &&
+		location.protocol === "file:"
+		) {
+		return "ascdesktop://fonts/" + path;
+		}
+		return path;
+	}
+	}
+	).then(mod => {
+		ModuleInstance = mod;
 		window.engineInit = true;
 		if (window.messageData)
 			checkMessage();
-	};
+	});
 
 	function checkMessage()
 	{
@@ -81,15 +100,7 @@
 		sender.postMessage({ hashValue : res });
 	}
 
-	//desktop_fetch
-	
-	//polyfill
-	
-	//string_utf8
-    
-    //module
-
-    var HashAlgs = {
+	var HashAlgs = {
         MD2       : 0,
         MD4       : 1,
         MD5       : 2,
@@ -101,17 +112,7 @@
         WHIRLPOOL : 8
     };
 
-    var HashSizes = [
-        16,
-        16,
-        16,
-        20,
-        20,
-        32,
-        48,
-        64,
-        64
-    ];
+    var HashSizes = [16,16,16,20,20,32,48,64,64];
 
 	window["AscCommon"] = window.AscCommon = (window["AscCommon"] || {});
 	window.AscCommon["Hash"] = window.AscCommon.Hash = {};
@@ -119,9 +120,9 @@
 	window.AscCommon.Hash["HashSizes"] = window.AscCommon.Hash.HashSizes = HashSizes;
 	
 	function HashObj() { this.buf; }
-	HashObj.prototype["buffer"] = HashObj.prototype.buffer = function()	{ return this.buf; };
-	HashObj.prototype["base64"] = HashObj.prototype.base64 = function() { return window.AscCommon.Base64.encode(this.buf); };
-	HashObj.prototype["hex"] = HashObj.prototype.hex = function() { return window.AscCommon.Hex.encode(this.buf); };
+	HashObj.prototype["buffer"] = HashObj.prototype.buffer = function() { return this.buf; };
+	HashObj.prototype["base64"] = HashObj.prototype.base64 = function() { return btoa(String.fromCharCode(...this.buf)) };
+	HashObj.prototype["hex"] = HashObj.prototype.hex = function() { return Array.from(this.buf).map(b => b.toString(16).padStart(2, '0')).join(''); };
 	
 	window.AscCommon.Hash["hash"] = window.AscCommon.Hash.hash = function(data, alg)
 	{
@@ -138,29 +139,26 @@
 				case "sha384" : alg = HashAlgs.SHA384; break;
 				case "sha512" : alg = HashAlgs.SHA512; break;
 				case "whirlpool" : alg = HashAlgs.WHIRLPOOL; break;
-				default:
-					alg = HashAlgs.SHA256;
+				default: alg = HashAlgs.SHA256;
 			}
 		}
 		
-		var arrayData = null;
-		if (typeof data === "string")
-			arrayData = data.toUtf8(true);
-		else
-			arrayData = data;
+		const encoder = new TextEncoder();
+
+		var arrayData = (typeof data === "string") ? encoder.encode(data) : data;
 		
-        var dataPointer = Module["_malloc"](arrayData.length);
-        Module["HEAPU8"].set(arrayData, dataPointer);		
-		var resultPointer = Module["_hash"](dataPointer, arrayData.length, alg);
-		Module["_free"](dataPointer);
+        var dataPointer = ModuleInstance._malloc(arrayData.length);
+        ModuleInstance.HEAPU8.set(arrayData, dataPointer);		
+		var resultPointer = ModuleInstance._hash(dataPointer, arrayData.length, alg);
+		ModuleInstance._free(dataPointer);
 		
 		var result = new HashObj();
 		if (0 != resultPointer)
 		{
-			var tmp = new Uint8Array(Module["HEAPU8"].buffer, resultPointer, HashSizes[alg]);
+			var tmp = new Uint8Array(ModuleInstance.HEAPU8.buffer, resultPointer, HashSizes[alg]);
 			result.buf = new Uint8Array(tmp.length);
 			result.buf.set(tmp, 0);
-			Module["_free"](resultPointer);
+			ModuleInstance._free(resultPointer);
 		}
 		else
 		{
@@ -185,31 +183,32 @@
 				case "sha384" : alg = HashAlgs.SHA384; break;
 				case "sha512" : alg = HashAlgs.SHA512; break;
 				case "whirlpool" : alg = HashAlgs.WHIRLPOOL; break;
-				default:
-					alg = HashAlgs.SHA256;
+				default: alg = HashAlgs.SHA256;
 			}
 		}
 
-		var passwordData = password.toUtf8();
-		var passwordPointer = Module["_malloc"](passwordData.length);
-		Module["HEAPU8"].set(passwordData, passwordPointer);
+		const encoder = new TextEncoder();
 
-		var saltData = salt.toUtf8();
-		var saltPointer = Module["_malloc"](saltData.length);
-		Module["HEAPU8"].set(saltData, saltPointer);
+		var passwordData = encoder.encode(password);
+		var passwordPointer = ModuleInstance._malloc(passwordData.length);
+		ModuleInstance.HEAPU8.set(passwordData, passwordPointer);
 
-		var resultPointer = Module["_hash2"](passwordPointer, saltPointer, spinCount, alg);
+		var saltData = encoder.encode(salt);
+		var saltPointer = ModuleInstance._malloc(saltData.length);
+		ModuleInstance.HEAPU8.set(saltData, saltPointer);
 
-		Module["_free"](passwordPointer);
-		Module["_free"](saltPointer);
+		var resultPointer = ModuleInstance._hash2(passwordPointer, saltPointer, spinCount, alg);
+
+		ModuleInstance._free(passwordPointer);
+		ModuleInstance._free(saltPointer);
 
 		var result = new HashObj();
 		if (0 != resultPointer)
 		{
-			var tmp = new Uint8Array(Module["HEAPU8"].buffer, resultPointer, HashSizes[alg]);
+			var tmp = new Uint8Array(ModuleInstance.HEAPU8.buffer, resultPointer, HashSizes[alg]);
 			result.buf = new Uint8Array(tmp.length);
 			result.buf.set(tmp, 0);
-			Module["_free"](resultPointer);
+			ModuleInstance._free(resultPointer);
 		}
 		else
 		{
