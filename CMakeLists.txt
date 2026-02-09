@@ -4,7 +4,7 @@ project(core)
 
 set(CORE_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
-set(EO_CORE_OUTPUT_DIR "${CMAKE_BINARY_DIR}/package" CACHE PATH "Where to place output files (absolute path recommended)")
+include(${CORE_ROOT_DIR}/common.cmake)
 
 # platform-specific compile flags
 if(EMSCRIPTEN)
@@ -19,14 +19,13 @@ else()
 
     add_compile_options(-march=native)
 
-    set(EO_CORE_3RD_PARTY_DIR "${CMAKE_BINARY_DIR}/third_party" CACHE PATH "Where to place and build 3rd party projects (absolute path recommended)")
-
     add_subdirectory( "${CORE_ROOT_DIR}/X2tConverter/build/cmake" x2t )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/AllFontsGen" allfontsgen )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/allthemesgen" allthemesgen )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/pluginsmanager" pluginsmanager )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/doctrenderer/app_builder" docbuilder )
 
+    #[[
     set( ALL_ARTIFACTS
         UnicodeConverter
         kernel
@@ -70,5 +69,6 @@ else()
         COMMAND /bin/sh -c "cp -P \"${EO_CORE_3RD_PARTY_INSTALL_DIR}/icu/lib\"/*.so* \"${EO_CORE_OUTPUT_DIR}/\""
         COMMENT "Copying ICU libs to ${EO_CORE_OUTPUT_DIR}"
     )
+    ]]
 
 endif()
