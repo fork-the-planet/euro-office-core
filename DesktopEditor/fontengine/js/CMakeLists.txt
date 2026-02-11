@@ -83,6 +83,7 @@ set(SOURCES
     ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/cid/type1cid.c
     ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/type42/type42.c
     ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/winfonts/winfnt.c
+    ${DESKTOP_ROOT}/graphics/GraphicsPath.cpp
 
     ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-aat-layout.cc
     ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-aat-map.cc
@@ -190,6 +191,7 @@ set(SOURCES
     ${DESKTOP_ROOT}/graphics/Matrix.cpp
 
     ${DESKTOP_ROOT}/agg-2.4/src/agg_trans_affine.cpp
+    ${DESKTOP_ROOT}/agg-2.4/src/agg_bezier_arc.cpp
 
     ${DESKTOP_ROOT}/raster/PICT/PICFile.cpp
     #${DESKTOP_ROOT}/raster/PICT/pic.cpp
@@ -411,30 +413,60 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # Exported functions
 # -------------------------------------------------
 set(EXPORTED_FUNCS
-"_malloc","_free",c
-"_ASC_FT_Malloc","_ASC_FT_Free","_ASC_FT_Init","_ASC_FT_Done_FreeType",
-"_ASC_FT_Set_TrueType_HintProp","_ASC_FT_Open_Face","_ASC_FT_Done_Face",
-"_ASC_FT_SetCMapForCharCode","_ASC_FT_GetFaceInfo",
-"_ASC_FT_GetFaceMaxAdvanceX","_ASC_FT_GetKerningX",
-"_ASC_FT_Set_Transform","_ASC_FT_Set_Char_Size",
-"_ASC_FT_Load_Glyph","_ASC_FT_Glyph_Get_CBox",
-"_ASC_FT_Get_Glyph_Measure_Params","_ASC_FT_Get_Glyph_Render_Params",
-"_ASC_FT_Get_Glyph_Render_Buffer",
-"_ASC_HB_LanguageFromString","_ASC_HB_ShapeText","_ASC_HB_FontFree",
-"_hyphenCreateApplication","_hyphenDestroyApplication",
-"_hyphenLoadDictionary","_hyphenCheckDictionary","_hyphenWord",
-"_Zlib_Malloc","_Zlib_Free","_Zlib_Create","_Zlib_Open","_Zlib_Close",
-"_Zlib_AddFile","_Zlib_RemoveFile","_Zlib_GetPaths","_Zlib_GetFile",
-"_Zlib_Save",
-"_Raster_DecodeFile","_Raster_GetDecodedBuffer","_Raster_GetHeight",
-"_Raster_GetWidth","_Raster_GetStride","_Raster_Destroy",
-"_Raster_EncodeImageData","_Raster_Encode","_Raster_GetEncodedBuffer",
-"_Raster_GetEncodedSize","_Raster_DestroyEncodedData",
-"_Image_GetFormat"
+    _malloc
+    _free
+    _ASC_FT_Malloc
+    _ASC_FT_Free
+    _ASC_FT_Init
+    _ASC_FT_Done_FreeType
+    _ASC_FT_Set_TrueType_HintProp
+    _ASC_FT_Open_Face
+    _ASC_FT_Done_Face
+    _ASC_FT_SetCMapForCharCode
+    _ASC_FT_GetFaceInfo
+    _ASC_FT_GetFaceMaxAdvanceX
+    _ASC_FT_GetKerningX
+    _ASC_FT_Set_Transform
+    _ASC_FT_Set_Char_Size
+    _ASC_FT_Load_Glyph
+    _ASC_FT_Glyph_Get_CBox
+    _ASC_FT_Get_Glyph_Measure_Params
+    _ASC_FT_Get_Glyph_Render_Params
+    _ASC_FT_Get_Glyph_Render_Buffer
+    _ASC_HB_LanguageFromString
+    _ASC_HB_ShapeText
+    _ASC_HB_FontFree
+    _hyphenCreateApplication
+    _hyphenDestroyApplication
+    _hyphenLoadDictionary
+    _hyphenCheckDictionary
+    _hyphenWord
+    _Zlib_Malloc
+    _Zlib_Free
+    _Zlib_Create
+    _Zlib_Open
+    _Zlib_Close
+    _Zlib_AddFile
+    _Zlib_RemoveFile
+    _Zlib_GetPaths
+    _Zlib_GetFile
+    _Zlib_Save
+    _Raster_DecodeFile
+    _Raster_GetDecodedBuffer
+    _Raster_GetHeight
+    _Raster_GetWidth
+    _Raster_GetStride
+    _Raster_Destroy
+    _Raster_EncodeImageData
+    _Raster_Encode
+    _Raster_GetEncodedBuffer
+    _Raster_GetEncodedSize
+    _Raster_DestroyEncodedData
+    _Image_GetFormat
 )
 
 #string(REPLACE ";" "," EXPORTED_FUNCS_STR "${EXPORTED_FUNCS}")
-
+list(JOIN EXPORTED_FUNCS "," EXPORTED_FUNCS_STR)
 # -------------------------------------------------
 # Linker flags (Emscripten)
 # -------------------------------------------------
@@ -445,13 +477,29 @@ target_link_options(${PROJECT_NAME} PRIVATE
 -sLLD_REPORT_UNDEFINED
 -sWASM=1
 -sEXPORTED_FUNCTIONS=[${EXPORTED_FUNCS_STR}]
---pre-js ${CMAKE_CURRENT_SOURCE_DIR}/engine/module_js.js
+-sEXPORTED_RUNTIME_METHODS=HEAP8,HEAPU8,HEAP32
+-sLEGACY_VM_SUPPORT=1
+"SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/engine/module_pre.js"
+"SHELL:--pre-js ${CORE_ROOT}/Common/js/string_utf8.js"
+"SHELL:--post-js ${CORE_ROOT}/Common/js/desktop_fetch_new.js"
+"SHELL:--post-js ${CMAKE_CURRENT_SOURCE_DIR}/engine/module_post.js"
 )
 
 # -------------------------------------------------
 # Output
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
+RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/engine
 SUFFIX ".js"
+)
+
+add_custom_target(copy_extra_files ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/module.js"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../engine.js"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/engine/module_native.js"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/fonts_native.js"
+    COMMENT "Copying extra files to output"
+    VERBATIM
 )
