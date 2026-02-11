@@ -26,6 +26,9 @@ add_custom_target(${PROJECT_NAME}_run_before ALL
 # -------------------------------------------------
 # Source files (compile_files_array)
 # -------------------------------------------------
+
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../..)
+
 set(SRC
     ${OPENSSL_3RDPARTY_DIR}/crypto/sha/keccak1600.c
     ${OPENSSL_3RDPARTY_DIR}/crypto/sha/sha1_one.c
@@ -63,7 +66,7 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_run_before)
 # Output settings
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
+    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/hash/hash
     SUFFIX ".js"
 )
 
@@ -112,6 +115,11 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sTOTAL_STACK=1MB"
     "-sINITIAL_MEMORY=2MB"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_hash','_hash2']"
-    "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
-    "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/hash_base.js"
+    "-sEXPORTED_RUNTIME_METHODS=['HEAPU8']"
+    "-sLEGACY_VM_SUPPORT=1"
+    "SHELL:--pre-js ${CORE_ROOT}/../sdkjs/common/stringserialize.js"
+    "SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/hash_base_pre.js"
+    "SHELL:--pre-js ${CORE_ROOT}/Common/js/string_utf8.js"
+    "SHELL:--post-js ${CORE_ROOT}/Common/js/desktop_fetch_new.js"
+    "SHELL:--post-js ${CMAKE_CURRENT_SOURCE_DIR}/hash_base_post.js"
 )
