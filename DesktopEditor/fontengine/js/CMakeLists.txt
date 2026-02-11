@@ -489,7 +489,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
 # Output
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/engine
+RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/libfont/engine
 SUFFIX ".js"
 )
 

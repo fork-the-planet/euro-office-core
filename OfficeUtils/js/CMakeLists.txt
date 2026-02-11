@@ -12,24 +12,6 @@ endif()
 
 
 # -------------------------------------------------
-# Pre / Post build scripts
-# -------------------------------------------------
-add_custom_target(${PROJECT_NAME}_run_after ALL VERBATIM
-    # That doesn't seem to be relevant anymore. I'll leave it there as a comment just to be on the safe side.
-    #COMMAND perl -i -0777 -pe
-    #        "s/\\Q__ATPOSTRUN__=[]\\E/__ATPOSTRUN__=[function(){self.onZlibEngineInit();}]/g"
-    #        ${CMAKE_CURRENT_SOURCE_DIR}/deploy/zlib.js	
-            
-    #COMMAND perl -i -0777 -pe
-    #        "s/\\Qfunction getBinaryPromise(){\\E/getBinaryPromise2(){/g"
-    #        ${CMAKE_CURRENT_SOURCE_DIR}/deploy/zlib.js
-
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/index.html ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}/index.html
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/code.js ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}/code.js
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-# -------------------------------------------------
 # Source files (compile_files_array)
 # -------------------------------------------------
 set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
@@ -431,7 +413,7 @@ add_executable(${PROJECT_NAME} ${SRC})
 # Output folder
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
+    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}/engine
 )
 
 # -------------------------------------------------
@@ -489,8 +471,21 @@ target_link_options(${PROJECT_NAME} PRIVATE
     "-sFILESYSTEM=0"
     "-sENVIRONMENT=web,worker"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_Zlib_Malloc','_Zlib_Free','_Zlib_Create','_Zlib_Open','_Zlib_Close','_Zlib_AddFile','_Zlib_RemoveFile','_Zlib_GetPaths','_Zlib_GetFile','_Zlib_Save','_Raster_DecodeFile','_Raster_GetDecodedBuffer','_Raster_GetHeight','_Raster_GetWidth','_Raster_GetStride','_Raster_Destroy','_Raster_EncodeImageData','_Raster_Encode','_Raster_GetEncodedBuffer','_Raster_GetEncodedSize','_Raster_DestroyEncodedData','_Image_GetFormat']"
-    "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
-    "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/zlib.js"
+    "-sEXPORTED_RUNTIME_METHODS=['HEAP8']"
+    "-sLEGACY_VM_SUPPORT=1"
+    "SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/zlib_pre.js"
+    "SHELL:--pre-js ${CORE_ROOT}/Common/js/string_utf8.js"
+    "SHELL:--post-js ${CORE_ROOT}/Common/js/desktop_fetch_new.js"
+    "SHELL:--post-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/zlib_post.js"
 )
 
-add_dependencies(${PROJECT_NAME}_run_after ${PROJECT_NAME})
+add_custom_target(${PROJECT_NAME}_copy_extra_files ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/index.html"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../index.html"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/code.js"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../code.js"
+    COMMENT "Copying extra files to output"
+    VERBATIM
+)

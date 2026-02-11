@@ -59,7 +59,7 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_run_before)
 # Output folder
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
+    RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}/spell
 )
 
 # -------------------------------------------------
