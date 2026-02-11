@@ -493,7 +493,7 @@ RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/engine
 SUFFIX ".js"
 )
 
-add_custom_target(copy_extra_files ALL
+add_custom_target(${PROJECT_NAME}_copy_extra_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_SOURCE_DIR}/module.js"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../engine.js"

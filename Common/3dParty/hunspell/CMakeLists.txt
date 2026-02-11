@@ -21,6 +21,9 @@ add_custom_target(${PROJECT_NAME}_run_before ALL
 # -------------------------------------------------
 # Source files (compile_files_array)
 # -------------------------------------------------
+
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+
 set(HUNSPELL_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/affentry.cxx
     ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/affixmgr.cxx
@@ -93,9 +96,23 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # -------------------------------------------------
 target_link_options(${PROJECT_NAME} PRIVATE
     "-sALLOW_MEMORY_GROWTH=1"
+    "-sSTACK_SIZE=10MB"
     "-sFILESYSTEM=0"
     "-sENVIRONMENT=web,worker"
     "-sEXPORTED_FUNCTIONS=['_malloc','_free','_Spellchecker_Malloc','_Spellchecker_Free','_Spellchecker_Create','_Spellchecker_Destroy','_Spellchecker_AddDictionary','_Spellchecker_RemoveDicrionary','_Spellchecker_Load','_Spellchecker_Spell','_Spellchecker_Suggest','_Spellchecker_RemoveEngine','_Spellchecker_TotalAllocatedMemory']"
-    "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
-    "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/spell.js"
+    "-sEXPORTED_RUNTIME_METHODS=['HEAP8']"
+    "-sLEGACY_VM_SUPPORT=1"
+    "SHELL:--post-js ${CORE_ROOT}/Common/js/desktop_fetch_new.js"
+    "SHELL:--post-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/spell_post.js"
+)
+
+add_custom_target(${PROJECT_NAME}_copy_extra_files ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/code.js"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../spell.js"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/index.html"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../index.html"
+    COMMENT "Copying extra files to output"
+    VERBATIM
 )

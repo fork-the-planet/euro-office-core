@@ -8,7 +8,7 @@ cd "$SCRIPT_DIR"
 
 if [ ! -d "$HUNSPELL_DIR" ]; then
   git clone --depth=1 --branch v1.7.2 https://github.com/hunspell/hunspell.git $HUNSPELL_DIR
-fi
+
 
 ./patch/apply_patch.sh \
   $HUNSPELL_DIR/src/hunspell/filemgr.hxx \
@@ -25,3 +25,4 @@ fi
 ./patch/apply_patch.sh \
   $HUNSPELL_DIR/src/hunspell/atypes.hxx \
   $SCRIPT_DIR/patch/hunspell4.patch
+fi
