@@ -30,7 +30,7 @@
  *
  */
 
-//string_utf8
+import '../../../../../../Common/js/string_utf8.js';
 
 function CNativePointer()
 {

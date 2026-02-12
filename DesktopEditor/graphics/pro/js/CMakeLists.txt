@@ -954,13 +954,40 @@ target_link_options(${PROJECT_NAME} PRIVATE
 -sLLD_REPORT_UNDEFINED
 -sWASM=1
 -sEXPORTED_FUNCTIONS=[${EXPORTED_FUNCS_STR}]
---pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_base.js
+"-sLEGACY_VM_SUPPORT=1"
+"SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_base_pre.js"
+"SHELL:--pre-js ${CORE_ROOT}/Common/js/string_utf8.js"
+"SHELL:--post-js ${CORE_ROOT}/Common/js/desktop_fetch_new.js"
+"SHELL:--post-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_base_post.js"
 )
 
 # -------------------------------------------------
 # Output location
 # -------------------------------------------------
 set_target_properties(${PROJECT_NAME} PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/${PROJECT_NAME}
+RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/engine
 SUFFIX ".js"
 )
+
+find_program(ESBUILD_EXECUTABLE NAMES esbuild esbuild.cmd PATHS "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/.bin")
+
+if (NOT ESBUILD_EXECUTABLE)
+    message(FATAL_ERROR "esbuild not found! Please run 'npm install esbuild' or download the binary.")
+endif()
+
+add_custom_command(
+    OUTPUT "${EO_CORE_OUTPUT_DIR}/engine/drawingfile_native.js"
+    COMMAND ${ESBUILD_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_main_entry.js --bundle --minify --format=iife --outfile=${EO_CORE_OUTPUT_DIR}/engine/drawingfile_native.js
+    # We can rely on glob for dependencies, or list main ones. 
+    # Ideally, list the main ones so CMake knows when to rebuild.
+    DEPENDS 
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_main_entry.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/stream.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_native.js"
+        "${CORE_ROOT}/Common/js/string_utf8.js"
+    COMMENT "Bundling JS with esbuild"
+    VERBATIM
+)
+
+add_custom_target(web_bundle ALL DEPENDS "${EO_CORE_OUTPUT_DIR}/engine/drawingfile_native.js")
