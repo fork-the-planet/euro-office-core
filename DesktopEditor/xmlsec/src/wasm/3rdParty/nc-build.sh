@@ -4,26 +4,20 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
-OPENSSL_DIR="$1"
+WORK_DIR="$1"
+INSTALL_DIR="$2"
 
-if [ ! -d "$OPENSSL_DIR" ]; then
-  git clone --depth=1 --branch OpenSSL_1_1_1f https://github.com/openssl/openssl.git $OPENSSL_DIR
+if [ ! -d "$WORK_DIR" ]; then
+  git clone --depth=1 --branch OpenSSL_1_1_1f https://github.com/openssl/openssl.git $WORK_DIR
 fi
 
-# patch1
-$SCRIPT_DIR/patches/apply_patch.sh \
-  $OPENSSL_DIR/crypto/rand/rand_lib.c \
-  $SCRIPT_DIR/patches/openssl1.patch
+# patch
+git -C "${WORK_DIR}" apply --check "${SCRIPT_DIR}/patches/fix-wasm-openssl.patch" && \
+git -C "${WORK_DIR}" apply "${SCRIPT_DIR}/patches/fix-wasm-openssl.patch"
 
 source /opt/emsdk/emsdk_env.sh
 
-cd $OPENSSL_DIR
-emconfigure ./config no-shared no-asm no-threads no-dso
+cd $WORK_DIR
+emconfigure ./config no-shared no-asm no-threads no-dso enable-md2 --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
 sed -i 's|^CROSS_COMPILE.*$|CROSS_COMPILE=|g' Makefile
 emmake make build_generated libcrypto.a libssl.a
-#emmake make install_sw
-
-# patch2 
-$SCRIPT_DIR/patches/apply_patch.sh \
-  $OPENSSL_DIR/include/openssl/opensslconf.h \
-  $SCRIPT_DIR/patches/openssl2.patch

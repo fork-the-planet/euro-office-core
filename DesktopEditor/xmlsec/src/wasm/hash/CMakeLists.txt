@@ -11,15 +11,17 @@ if(NOT EMSCRIPTEN)
     message(FATAL_ERROR "This project must be built with Emscripten (use emcmake).")
 endif()
 
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../..)
+
+include(${CORE_ROOT}/common.cmake)
 
 # -------------------------------------------------
 # Pre / Post build scripts
 # -------------------------------------------------
 set(OPENSSL_ROOT "../3rdParty")
 get_filename_component(OPENSSL_ROOT_ABS "${OPENSSL_ROOT}" ABSOLUTE)
-set(OPENSSL_3RDPARTY_DIR "${OPENSSL_ROOT_ABS}/openssl-wasm")
 add_custom_target(${PROJECT_NAME}_run_before ALL
-    COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${OPENSSL_3RDPARTY_DIR}"
+    COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash" "${EO_CORE_3RD_PARTY_INSTALL_DIR}/openssl-hash"
 )
 
 
@@ -27,31 +29,29 @@ add_custom_target(${PROJECT_NAME}_run_before ALL
 # Source files (compile_files_array)
 # -------------------------------------------------
 
-set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../..)
-
 set(SRC
-    ${OPENSSL_3RDPARTY_DIR}/crypto/sha/keccak1600.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/sha/sha1_one.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/sha/sha1dgst.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/sha/sha256.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/sha/sha512.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/sha/keccak1600.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/sha/sha1_one.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/sha/sha1dgst.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/sha/sha256.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/sha/sha512.c
 
-    ${OPENSSL_3RDPARTY_DIR}/crypto/md2/md2_dgst.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/md2/md2_one.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/md2/md2_dgst.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/md2/md2_one.c
 
-    ${OPENSSL_3RDPARTY_DIR}/crypto/md4/md4_dgst.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/md4/md4_one.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/md4/md4_dgst.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/md4/md4_one.c
 
-    ${OPENSSL_3RDPARTY_DIR}/crypto/md5/md5_dgst.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/md5/md5_one.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/md5/md5_dgst.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/md5/md5_one.c
 
-    ${OPENSSL_3RDPARTY_DIR}/crypto/ripemd/rmd_dgst.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/ripemd/rmd_one.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/ripemd/rmd_dgst.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/ripemd/rmd_one.c
 
-    ${OPENSSL_3RDPARTY_DIR}/crypto/whrlpool/wp_block.c
-    ${OPENSSL_3RDPARTY_DIR}/crypto/whrlpool/wp_dgst.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/whrlpool/wp_block.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/whrlpool/wp_dgst.c
 
-    ${OPENSSL_3RDPARTY_DIR}/crypto/mem_clr.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/crypto/mem_clr.c
 )
 
 set_source_files_properties(${SRC} PROPERTIES GENERATED TRUE)
@@ -75,15 +75,15 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # -------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${OPENSSL_3RDPARTY_DIR}/include
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/include
 )
 
 # -------------------------------------------------
 # link libraries
 # -------------------------------------------------
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${OPENSSL_3RDPARTY_DIR}/libcrypto.a
-    ${OPENSSL_3RDPARTY_DIR}/libssl.a
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/libcrypto.a
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/libssl.a
 )
 
 # -------------------------------------------------
