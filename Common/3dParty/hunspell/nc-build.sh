@@ -10,19 +10,8 @@ if [ ! -d "$HUNSPELL_DIR" ]; then
   git clone --depth=1 --branch v1.7.2 https://github.com/hunspell/hunspell.git $HUNSPELL_DIR
 
 
-./patch/apply_patch.sh \
-  $HUNSPELL_DIR/src/hunspell/filemgr.hxx \
-  $SCRIPT_DIR/patch/hunspell1.patch
+# patch
+git -C "${HUNSPELL_DIR}" apply --check "${SCRIPT_DIR}/patches/fix-wasm-hunspell.patch" && \
+git -C "${HUNSPELL_DIR}" apply "${SCRIPT_DIR}/patches/fix-wasm-hunspell.patch"
 
-./patch/apply_patch.sh \
-  $HUNSPELL_DIR/src/hunspell/filemgr.hxx \
-  $SCRIPT_DIR/patch/hunspell2.patch
-
-./patch/apply_patch.sh \
-  $HUNSPELL_DIR/src/hunspell/csutil.cxx \
-  $SCRIPT_DIR/patch/hunspell3.patch
-
-./patch/apply_patch.sh \
-  $HUNSPELL_DIR/src/hunspell/atypes.hxx \
-  $SCRIPT_DIR/patch/hunspell4.patch
 fi

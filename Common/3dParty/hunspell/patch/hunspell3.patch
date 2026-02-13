@@ -1,6 +1,0 @@
-<<<<<<<
-void free_utf_tbl() {
-=======
-void free_utf_tbl() {
-    return;
->>>>>>>

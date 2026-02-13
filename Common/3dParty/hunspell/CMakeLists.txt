@@ -10,30 +10,30 @@ if(NOT EMSCRIPTEN)
     message(FATAL_ERROR "This project must be built with Emscripten (use emcmake).")
 endif()
 
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+
+include(${CORE_ROOT}/common.cmake)
 
 # -------------------------------------------------
 # Pre / Post build scripts
 # -------------------------------------------------
 add_custom_target(${PROJECT_NAME}_run_before ALL
-    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/nc-build.sh "${CMAKE_CURRENT_SOURCE_DIR}/hunspell"
+    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/nc-build.sh "${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell"
 )
 
 # -------------------------------------------------
 # Source files (compile_files_array)
 # -------------------------------------------------
-
-set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
-
 set(HUNSPELL_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/affentry.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/affixmgr.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/csutil.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/hashmgr.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/hunspell.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/hunzip.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/phonet.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/replist.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell/suggestmgr.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/affentry.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/affixmgr.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/csutil.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/hashmgr.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/hunspell.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/hunzip.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/phonet.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/replist.cxx
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell/suggestmgr.cxx
 )
 
 set_source_files_properties(${HUNSPELL_SRC} PROPERTIES GENERATED TRUE)
@@ -66,7 +66,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # Include directories
 # -------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/hunspell/src/hunspell
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hunspell/src/hunspell
     ${CMAKE_CURRENT_SOURCE_DIR}/wasm/src
 )
 
