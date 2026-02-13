@@ -14,14 +14,15 @@ endif()
 set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
 set(DESKTOP_ROOT ${CORE_ROOT}/DesktopEditor)
 
+include(${CORE_ROOT}/common.cmake)
+
 # -------------------------------------------------
 # Pre/Post scripts
 # -------------------------------------------------
 add_custom_target(${PROJECT_NAME}_run_before ALL
-    COMMAND bash ${CORE_ROOT}/Common/3dParty/brotli/nc-fetch.sh ${CORE_ROOT}/Common/3dParty/brotli/brotli
-    COMMAND bash ${CORE_ROOT}/Common/3dParty/harfbuzz/nc-fetch.sh ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz
-    COMMAND bash ${CORE_ROOT}/Common/3dParty/hyphen/nc-fetch.sh ${DESKTOP_ROOT}/fontengine/hyphen
-    COMMAND bash ${DESKTOP_ROOT}/graphics/pro/js/nc-build.sh
+    COMMAND bash ${CORE_ROOT}/Common/3dParty/brotli/nc-fetch.sh ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli
+    COMMAND bash ${CORE_ROOT}/Common/3dParty/harfbuzz/nc-fetch.sh ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz
+    COMMAND bash ${CORE_ROOT}/Common/3dParty/hyphen/nc-fetch.sh ${EO_CORE_3RD_PARTY_WORK_DIR}/hyphen/hyphen
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -32,134 +33,134 @@ add_custom_target(${PROJECT_NAME}_run_before ALL
 
 set(SOURCES
 
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/common/constants.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/common/context.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/common/dictionary.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/common/platform.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/common/shared_dictionary.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/common/transform.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/common/constants.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/common/context.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/common/dictionary.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/common/platform.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/common/shared_dictionary.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/common/transform.c
 
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/dec/bit_reader.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/dec/decode.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/dec/huffman.c
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/dec/state.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/dec/bit_reader.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/dec/decode.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/dec/huffman.c
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/dec/state.c
 
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftdebug.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/autofit/autofit.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/bdf/bdf.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/cff/cff.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftbase.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftbitmap.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftfstype.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftgasp.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/cache/ftcache.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftglyph.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/gzip/ftgzip.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftinit.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/lzw/ftlzw.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftstroke.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftsystem.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/smooth/smooth.cpp
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftbbox.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftbdf.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftcid.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftmm.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftpfr.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftsynth.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/fttype1.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftwinfnt.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftgxval.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftotval.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/base/ftpatent.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/pcf/pcf.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/pfr/pfr.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/psaux/psaux.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/pshinter/pshinter.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/psnames/psmodule.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/raster/raster.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/sfnt/sfnt.cpp
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/truetype/truetype.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/type1/type1.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/cid/type1cid.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/type42/type42.c
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/src/winfonts/winfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftdebug.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/autofit/autofit.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/bdf/bdf.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/cff/cff.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbase.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbitmap.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftfstype.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftgasp.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/cache/ftcache.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftglyph.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/gzip/ftgzip.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftinit.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/lzw/ftlzw.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftstroke.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftsystem.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/smooth/smooth.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbbox.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbdf.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftcid.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftmm.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftpfr.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftsynth.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/fttype1.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftwinfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftgxval.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftotval.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftpatent.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/pcf/pcf.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/pfr/pfr.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/psaux/psaux.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/pshinter/pshinter.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/psnames/psmodule.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/raster/raster.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/sfnt/sfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/truetype/truetype.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/type1/type1.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/cid/type1cid.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/type42/type42.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/winfonts/winfnt.c
     ${DESKTOP_ROOT}/graphics/GraphicsPath.cpp
 
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-aat-layout.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-aat-map.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-blob.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-buffer-serialize.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-buffer-verify.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-buffer.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-cairo-utils.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-cairo.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-common.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-coretext.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-directwrite.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-draw.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-face-builder.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-face.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-fallback-shape.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-font.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ft.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-gdi.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-glib.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-gobject-structs.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-graphite2.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-icu.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-map.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-number.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-cff1-table.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-cff2-table.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-color.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-face.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-font.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-layout.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-map.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-math.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-meta.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-metrics.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-name.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shape-fallback.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shape-normalize.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shape.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-arabic.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-default.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-hangul.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-hebrew.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-indic-table.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-indic.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-khmer.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-myanmar.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-syllabic.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-thai.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-use.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-shaper-vowel-constraints.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-tag.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ot-var.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-outline.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-paint-extents.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-paint.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-set.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-shape-plan.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-shape.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-shaper.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-static.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-style.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset-cff-common.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset-cff1.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset-cff2.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset-input.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset-instancer-solver.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset-plan.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset-repacker.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-subset.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-ucd.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-unicode.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-uniscribe.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-wasm-api.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/hb-wasm-shape.cc
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src/graph/gsubgpos-context.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-aat-layout.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-aat-map.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-blob.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-buffer-serialize.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-buffer-verify.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-buffer.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-cairo-utils.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-cairo.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-common.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-coretext.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-directwrite.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-draw.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-face-builder.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-face.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-fallback-shape.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-font.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ft.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-gdi.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-glib.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-gobject-structs.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-graphite2.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-icu.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-map.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-number.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-cff1-table.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-cff2-table.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-color.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-face.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-font.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-layout.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-map.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-math.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-meta.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-metrics.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-name.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shape-fallback.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shape-normalize.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shape.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-arabic.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-default.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-hangul.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-hebrew.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-indic-table.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-indic.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-khmer.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-myanmar.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-syllabic.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-thai.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-use.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-shaper-vowel-constraints.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-tag.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ot-var.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-outline.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-paint-extents.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-paint.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-set.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-shape-plan.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-shape.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-shaper.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-static.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-style.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset-cff-common.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset-cff1.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset-cff2.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset-input.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset-instancer-solver.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset-plan.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset-repacker.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-subset.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-ucd.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-unicode.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-uniscribe.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-wasm-api.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/hb-wasm-shape.cc
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src/graph/gsubgpos-context.cc
 
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11/adler32.c
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11/crc32.c
@@ -356,6 +357,14 @@ set(SOURCES
 
 set_source_files_properties(${SOURCES} PROPERTIES GENERATED TRUE)
 
+set_source_files_properties(
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/smooth/smooth.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/smooth/ftgrays.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/sfnt/sfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/sfnt/ttcmap.c
+    PROPERTIES LANGUAGE CXX
+)
+
 # -------------------------------------------------
 # Executable (WASM module)
 # -------------------------------------------------
@@ -366,12 +375,14 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_run_before)
 # Include paths
 # -------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/include
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/include/freetype
-    ${DESKTOP_ROOT}/graphics/pro/js/freetype-2.10.4/include/freetype/internal
+    ${DESKTOP_ROOT}/freetype-2.10.4/include
+    ${DESKTOP_ROOT}/freetype-2.10.4/include/freetype
+    ${DESKTOP_ROOT}/freetype-2.10.4/include/freetype/internal
     ${DESKTOP_ROOT}/graphics/pro/js/wasm/src/lib
-    ${CORE_ROOT}/Common/3dParty/harfbuzz/harfbuzz/src
-    ${CORE_ROOT}/Common/3dParty/brotli/brotli/c/include
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/harfbuzz/src
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/brotli/c/include
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hyphen/hyphen/c/include
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/hyphen/
     ${CORE_ROOT}/OfficeUtils/src
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11
     ${DESKTOP_ROOT}/cximage/jasper/include
