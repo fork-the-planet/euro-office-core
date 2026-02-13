@@ -11,20 +11,46 @@ if(NOT EMSCRIPTEN)
     message(FATAL_ERROR "This project must be built with Emscripten (use emcmake).")
 endif()
 
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../..)
+set(DESKTOP_ROOT ${CORE_ROOT}/DesktopEditor)
+
+include(${CORE_ROOT}/common.cmake)
+
 # -------------------------------------------------
 # Pre/Post build scripts
 # -------------------------------------------------
-add_custom_target(${PROJECT_NAME}_run_before ALL
-    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/nc-build.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+set(PATCH_STAMP ${CMAKE_BINARY_DIR}/.draw_prereqs_done)
+
+add_custom_command(
+    OUTPUT ${PATCH_STAMP}
+
+    COMMAND bash ${CORE_ROOT}/Common/3dParty/icu/nc-build.sh
+            "${EO_CORE_3RD_PARTY_WORK_DIR}/icu"
+            "${EO_CORE_3RD_PARTY_INSTALL_DIR}/icu"
+            74 2 1
+
+    COMMAND bash ${CORE_ROOT}/Common/3dParty/openssl/nc-build.sh
+            "${EO_CORE_3RD_PARTY_WORK_DIR}/openssl"
+            "${EO_CORE_3RD_PARTY_INSTALL_DIR}/openssl"
+            1
+
+    COMMAND git -C ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu apply
+            ${CMAKE_CURRENT_SOURCE_DIR}/wasm/patches/fix-wasm-icu.patch
+
+    COMMAND git -C ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl apply
+            ${CMAKE_CURRENT_SOURCE_DIR}/wasm/patches/fix-wasm-openssl.patch 
+
+    COMMAND ${CMAKE_COMMAND} -E touch ${PATCH_STAMP}
+)
+
+add_custom_target(${PROJECT_NAME}_run_before
+    DEPENDS ${PATCH_STAMP}
 )
 
 # -------------------------------------------------
 # Source files
 # (generated from compile_files_array)
 # -------------------------------------------------
-set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../..)
-set(DESKTOP_ROOT ${CORE_ROOT}/DesktopEditor)
 set(SOURCES
 
     ${DESKTOP_ROOT}/raster/BgraFrame.cpp
@@ -730,126 +756,126 @@ set(SOURCES
 
     ${CORE_ROOT}/OdfFile/Common/logging.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ustr_wcs.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ustrtrns.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/udata.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_io.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ustring.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/umutex.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/putil.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ustr_cnv.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnvmbcs.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucln_cmn.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv2022.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnvbocu.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/stringpiece.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/charstr.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_ext.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uobject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/usprep.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/unistr.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uniset_props.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/loadednormalizer2impl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/filterednormalizer2.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/utrie2.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/normalizer2.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/normalizer2impl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/utrie.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uniset.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ruleiter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/parsepos.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/util.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uprops.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uvector.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/unames.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/propname.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/utrie2_builder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/unifunct.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/bmpset.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/unisetspan.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/unifilt.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/patternprops.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ustrcase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/bytestrie.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/utf_impl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/cmemory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uhash.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/udatamem.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/umapfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uinvchar.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uchar.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ubidi_props.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/characterproperties.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucptrie.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/edits.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/umutablecptrie.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/bytesinkutil.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/emojiprops.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/cstring.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucmndata.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_u7.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_u8.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_u16.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_u32.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_err.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_cnv.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_lmb.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_cb.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_ct.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucharstrieiterator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnvlat1.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/uvectr32.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnvhz.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnvscsu.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnv_bld.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common/ucnvisci.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ustr_wcs.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ustrtrns.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/udata.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_io.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ustring.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/umutex.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/putil.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ustr_cnv.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnvmbcs.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucln_cmn.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv2022.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnvbocu.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/stringpiece.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/charstr.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_ext.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uobject.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/usprep.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/unistr.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uniset_props.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/loadednormalizer2impl.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/filterednormalizer2.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/utrie2.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/normalizer2.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/normalizer2impl.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/utrie.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucase.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uniset.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ruleiter.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/parsepos.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/util.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uprops.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uvector.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/unames.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/propname.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/utrie2_builder.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/unifunct.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/bmpset.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/unisetspan.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/unifilt.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/patternprops.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ustrcase.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/bytestrie.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/utf_impl.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/cmemory.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uhash.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/udatamem.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/umapfile.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uinvchar.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uchar.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ubidi_props.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/characterproperties.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucptrie.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/edits.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/umutablecptrie.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/bytesinkutil.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/emojiprops.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/cstring.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucmndata.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_u7.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_u8.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_u16.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_u32.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_err.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_cnv.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_lmb.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_cb.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_ct.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucharstrieiterator.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnvlat1.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/uvectr32.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnvhz.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnvscsu.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnv_bld.cpp
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common/ucnvisci.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftdebug.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/autofit/autofit.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/bdf/bdf.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/cff/cff.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftbase.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftbitmap.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftfstype.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftgasp.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/cache/ftcache.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftglyph.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/gzip/ftgzip.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftinit.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/lzw/ftlzw.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftstroke.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftsystem.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/smooth/smooth.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftbbox.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftbdf.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftcid.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftmm.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftpfr.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftsynth.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/fttype1.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftwinfnt.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftgxval.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftotval.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/base/ftpatent.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/pcf/pcf.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/pfr/pfr.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/psaux/psaux.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/pshinter/pshinter.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/psnames/psmodule.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/raster/raster.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/sfnt/sfnt.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/truetype/truetype.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/type1/type1.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/cid/type1cid.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/type42/type42.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/src/winfonts/winfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftdebug.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/autofit/autofit.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/bdf/bdf.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/cff/cff.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbase.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbitmap.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftfstype.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftgasp.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/cache/ftcache.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftglyph.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/gzip/ftgzip.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftinit.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/lzw/ftlzw.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftstroke.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftsystem.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/smooth/smooth.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbbox.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftbdf.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftcid.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftmm.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftpfr.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftsynth.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/fttype1.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftwinfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftgxval.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftotval.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/base/ftpatent.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/pcf/pcf.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/pfr/pfr.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/psaux/psaux.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/pshinter/pshinter.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/psnames/psmodule.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/raster/raster.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/sfnt/sfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/truetype/truetype.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/type1/type1.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/cid/type1cid.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/type42/type42.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/winfonts/winfnt.c
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml/src/xmllight.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml/src/xmldom.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml/build/qt/libxml2_all.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml/build/qt/libxml2_all2.c
+    ${DESKTOP_ROOT}/xml/src/xmllight.cpp
+    ${DESKTOP_ROOT}/xml/src/xmldom.cpp
+    ${DESKTOP_ROOT}/xml/build/qt/libxml2_all.c
+    ${DESKTOP_ROOT}/xml/build/qt/libxml2_all2.c
 
     ${CMAKE_CURRENT_SOURCE_DIR}/wasm/src/lib/wasm_jmp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wasm/src/drawingfile.cpp
@@ -859,6 +885,13 @@ set(SOURCES
 
 set_source_files_properties(${SOURCES} PROPERTIES GENERATED TRUE)
 
+set_source_files_properties(
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/smooth/smooth.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/smooth/ftgrays.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/sfnt/sfnt.c
+    ${DESKTOP_ROOT}/freetype-2.10.4/src/sfnt/ttcmap.c
+    PROPERTIES LANGUAGE CXX
+)
 
 # -------------------------------------------------
 # Library target
@@ -877,12 +910,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${DESKTOP_ROOT}/cximage/jasper/include
     ${DESKTOP_ROOT}/cximage/jpeg
     ${DESKTOP_ROOT}/cximage/png
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.10.4/include/freetype
+    ${DESKTOP_ROOT}/freetype-2.10.4/include
+    ${DESKTOP_ROOT}/freetype-2.10.4/include/freetype
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11
     ${CORE_ROOT}/OfficeUtils/src/zlib-1.2.11/contrib/minizip
     ${CORE_ROOT}/OfficeUtils/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/icu/icu/source/common
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/icu/icu/source/common
     ${DESKTOP_ROOT}/xml/libxml2/include
     ${DESKTOP_ROOT}/xml/build/qt
     ${CORE_ROOT}/PdfFile/lib/goo
@@ -891,8 +924,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CORE_ROOT}/PdfFile/lib
     ${DESKTOP_ROOT}/raster/Jp2/openjpeg
     ${DESKTOP_ROOT}/raster/Jp2/openjpeg/openjpeg-2.4.0/src/lib/openjp2
-    ${CORE_ROOT}/Common/3dParty/openssl/openssl/include
-    ${CORE_ROOT}/Common/3dParty/openssl/build/linux_64/include
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl/include
+    ${EO_CORE_3RD_PARTY_INSTALL_DIR}/openssl/include
     ${CORE_ROOT}/DocxRenderer
 )
 
@@ -969,15 +1002,12 @@ RUNTIME_OUTPUT_DIRECTORY ${EO_CORE_OUTPUT_DIR}/engine
 SUFFIX ".js"
 )
 
-find_program(ESBUILD_EXECUTABLE NAMES esbuild esbuild.cmd PATHS "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/.bin")
-
-if (NOT ESBUILD_EXECUTABLE)
-    message(FATAL_ERROR "esbuild not found! Please run 'npm install esbuild' or download the binary.")
-endif()
+find_program(NPM_EXECUTABLE npm REQUIRED)
 
 add_custom_command(
     OUTPUT "${EO_CORE_OUTPUT_DIR}/engine/drawingfile_native.js"
-    COMMAND ${ESBUILD_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_main_entry.js --bundle --minify --format=iife --outfile=${EO_CORE_OUTPUT_DIR}/engine/drawingfile_native.js
+    COMMAND ${NPM_EXECUTABLE} install esbuild
+    COMMAND ${NPM_EXECUTABLE} exec esbuild -- ${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_main_entry.js --bundle --minify --format=iife --outfile=${EO_CORE_OUTPUT_DIR}/engine/drawingfile_native.js
     # We can rely on glob for dependencies, or list main ones. 
     # Ideally, list the main ones so CMake knows when to rebuild.
     DEPENDS 
@@ -987,6 +1017,7 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/wasm/js/drawingfile_native.js"
         "${CORE_ROOT}/Common/js/string_utf8.js"
     COMMENT "Bundling JS with esbuild"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     VERBATIM
 )
 

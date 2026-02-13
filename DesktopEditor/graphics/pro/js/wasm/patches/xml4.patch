@@ -1,5 +1,0 @@
-<<<<<<<
-int xmlGetWarningsDefaultValue = 1;
-=======
-int xmlGetWarningsDefaultValue = 0;
->>>>>>>

@@ -1,5 +1,0 @@
-<<<<<<<
-const SHA_LONG64 *W = in;
-=======
-const SHA_LONG64 *W = (const SHA_LONG64*)in;
->>>>>>>
