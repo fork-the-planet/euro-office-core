@@ -926,6 +926,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${DESKTOP_ROOT}/raster/Jp2/openjpeg/openjpeg-2.4.0/src/lib/openjp2
     ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl/include
     ${EO_CORE_3RD_PARTY_INSTALL_DIR}/openssl/include
+    ${EO_CORE_3RD_PARTY_WORK_DIR}/openssl
     ${CORE_ROOT}/DocxRenderer
 )
 
@@ -966,19 +967,46 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # Emscripten linker flags
 # -------------------------------------------------
 set(EXPORTED_FUNCS
-"_malloc","_free","_GetType","_Open","_Close","_GetErrorCode",
-"_GetInfo","_GetPixmap","_GetGlyphs","_GetLinks","_GetStructure",
-"_GetInteractiveFormsInfo","_GetInteractiveFormsFonts",
-"_GetInteractiveFormsAP","_GetButtonIcons","_GetAnnotationsInfo",
-"_GetAnnotationsAP","_InitializeFontsBin","_InitializeFontsBase64",
-"_InitializeFontsRanges","_SetFontBinary","_GetFontBinary",
-"_IsFontBinaryExist","_DestroyTextInfo","_IsNeedCMap","_SetCMapData",
-"_ScanPage","_SplitPages","_MergePages","_UnmergePages",
-"_RedactPage","_UndoRedact","_GetImageBase64","_GetImageBase64Len",
-"_GetImageBase64Ptr","_GetImageBase64Free"
+    _malloc
+    _free
+    _GetType
+    _Open
+    _Close
+    _GetErrorCode
+    _GetInfo
+    _GetPixmap
+    _GetGlyphs
+    _GetLinks
+    _GetStructure
+    _GetInteractiveFormsInfo
+    _GetInteractiveFormsFonts
+    _GetInteractiveFormsAP
+    _GetButtonIcons
+    _GetAnnotationsInfo
+    _GetAnnotationsAP
+    _InitializeFontsBin
+    _InitializeFontsBase64
+    _InitializeFontsRanges
+    _SetFontBinary
+    _GetFontBinary
+    _IsFontBinaryExist
+    _DestroyTextInfo
+    _IsNeedCMap
+    _SetCMapData
+    _ScanPage
+    _SplitPages
+    _MergePages
+    _UnmergePages
+    _RedactPage
+    _UndoRedact
+    _GetImageBase64
+    _GetImageBase64Len
+    _GetImageBase64Ptr
+    _GetImageBase64Free
 )
 
 #string(REPLACE ";" "," EXPORTED_FUNCS_STR "${EXPORTED_FUNCS}")
+list(JOIN EXPORTED_FUNCS "," EXPORTED_FUNCS_STR)
 
 target_link_options(${PROJECT_NAME} PRIVATE
 -sALLOW_MEMORY_GROWTH=1
