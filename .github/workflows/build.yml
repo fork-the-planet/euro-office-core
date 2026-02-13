@@ -41,3 +41,27 @@ jobs:
     
     - name: Build
       run: cmake --build build
+
+# 2. WebAssembly Build
+  build-wasm:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup Emscripten
+      uses: emscripten-core/emsdk@v14
+      with:
+        version: latest
+        # The action automatically adds emcc/emcmake to the PATH
+
+    - name: Verify Emscripten
+      run: emcc -v
+
+    - name: Build with Emscripten
+      run: |
+        emcmake cmake -S . -B build-wasm
+        
+        cmake --build build-wasm
