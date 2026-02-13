@@ -10,7 +10,7 @@ include(${CORE_ROOT_DIR}/common.cmake)
 if(EMSCRIPTEN)
 
     add_subdirectory( "${CORE_ROOT_DIR}/OfficeUtils/js" zlib )
-    add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/xmlsec/src/wasm/oform_plugin/module" oform_plugin )
+    #add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/xmlsec/src/wasm/oform_plugin/module" oform_plugin )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/xmlsec/src/wasm/hash/" hash )
     add_subdirectory( "${CORE_ROOT_DIR}/Common/3dParty/hunspell" spell )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/fontengine/js" fonts )

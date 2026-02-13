@@ -11,19 +11,23 @@ if(NOT EMSCRIPTEN)
     message(FATAL_ERROR "This project must be built with Emscripten (use emcmake).")
 endif()
 
+set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../..)
+
+include(${CORE_ROOT}/common.cmake)
+
 # -------------------------------------------------
 # Pre / Post build scripts
 # -------------------------------------------------
+set(OPENSSL_ROOT "../../3rdParty")
+get_filename_component(OPENSSL_ROOT_ABS "${OPENSSL_ROOT}" ABSOLUTE)
 add_custom_target(${PROJECT_NAME}_run_before ALL
-    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/nc-build.sh
+    COMMAND bash ${OPENSSL_ROOT_ABS}/nc-build.sh "${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash" "${EO_CORE_3RD_PARTY_INSTALL_DIR}/openssl-hash"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # -------------------------------------------------
 # Source files (compile_files_array)
 # -------------------------------------------------
-set(CORE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../..)
-
 set(SOURCES
     ${CORE_ROOT}/DesktopEditor/common/Base64.cpp
     ${CORE_ROOT}/DesktopEditor/common/File.cpp
@@ -43,8 +47,8 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_run_before)
 # Include directories
 # -------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-${CORE_ROOT}/DesktopEditor/xmlsec/src/wasm/3rdParty/openssl-wasm/include
-${CORE_ROOT}/DesktopEditor/xmlsec/src/wasm/3rdParty/openssl-wasm
+${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/include
+${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash
 #emsdk/node/14.15.5_64bit/include/node/openssl/archs/linux-x86_64/no-asm/include
 )
 
@@ -66,21 +70,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 )
 
 # -------------------------------------------------
-# Exported functions
-# -------------------------------------------------
-set(EXPORTED_FUNCS
-"_malloc",
-"_free",
-"_Crypto_Malloc",
-"_Crypto_Free",
-"_Crypto_CreateKeys",
-"_Crypto_Sign",
-"_Crypto_ChangePassword"
-)
-
-#string(REPLACE ";" "," EXPORTED_FUNCS_STR "${EXPORTED_FUNCS}")
-
-# -------------------------------------------------
 # Linker flags (Emscripten -s options)
 # -------------------------------------------------
 target_link_options(${PROJECT_NAME} PRIVATE
@@ -90,15 +79,21 @@ target_link_options(${PROJECT_NAME} PRIVATE
 -sASSERTIONS
 -sLLD_REPORT_UNDEFINED
 -sWASM=1
--sEXPORTED_FUNCTIONS=[${EXPORTED_FUNCS_STR}]
---pre-js ${CMAKE_CURRENT_SOURCE_DIR}/engine_base.js
+"-sEXPORTED_FUNCTIONS=['_malloc','_free','_Crypto_Malloc','_Crypto_Free', '_Crypto_CreateKeys', '_Crypto_Sign', '_Crypto_ChangePassword']"
+"-sEXPORTED_RUNTIME_METHODS=['HEAP8']"
+"-sLEGACY_VM_SUPPORT=1"
+"SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/engine_base_pre-1.js"
+"SHELL:--pre-js ${CORE_ROOT}/Common/js/string_utf8.js"
+"SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/engine_base_pre-2.js"
+"SHELL:--post-js ${CORE_ROOT}/Common/js/desktop_fetch_new.js"
+"SHELL:--post-js ${CMAKE_CURRENT_SOURCE_DIR}/engine_base_post.js"
 )
 
 # -------------------------------------------------
 # Link static OpenSSL crypto lib
 # -------------------------------------------------
 target_link_libraries(${PROJECT_NAME} PRIVATE
-${CORE_ROOT}/DesktopEditor/xmlsec/src/wasm/3rdParty/openssl-wasm/libcrypto.a
+${EO_CORE_3RD_PARTY_WORK_DIR}/openssl-hash/libcrypto.a
 )
 
 # -------------------------------------------------
