@@ -45,20 +45,20 @@ jobs:
 # 2. WebAssembly Build
   build-wasm:
     runs-on: [ubuntu-latest, self-hosted]
-  container:
-      image: emscripten/emsdk:5.0.0
+    container:
+        image: emscripten/emsdk:5.0.0
 
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Verify Emscripten
-      run: emcc -v
+      - name: Verify Emscripten
+        run: emcc -v
 
-    - name: Build with Emscripten
-      run: |
-        emcmake cmake -S . -B build-wasm
-        
-        cmake --build build-wasm
+      - name: Build with Emscripten
+        run: |
+          emcmake cmake -S . -B build-wasm
+          
+          cmake --build build-wasm
