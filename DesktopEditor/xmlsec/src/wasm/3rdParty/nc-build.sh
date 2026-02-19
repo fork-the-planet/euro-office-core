@@ -15,7 +15,11 @@ fi
 git -C "${WORK_DIR}" apply --check "${SCRIPT_DIR}/patches/fix-wasm-openssl.patch" && \
 git -C "${WORK_DIR}" apply "${SCRIPT_DIR}/patches/fix-wasm-openssl.patch"
 
-source /opt/emsdk/emsdk_env.sh
+if [ -f "/opt/emsdk/emsdk_env.sh" ]; then
+    source /opt/emsdk/emsdk_env.sh
+else
+    echo "Warning: /opt/emsdk/emsdk_env.sh not found, skipping source..."
+fi
 
 cd $WORK_DIR
 emconfigure ./config no-shared no-asm no-threads no-dso enable-md2 --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
