@@ -45,17 +45,14 @@ jobs:
 # 2. WebAssembly Build
   build-wasm:
     runs-on: [ubuntu-latest, self-hosted]
-    steps:
+  container:
+      image: emscripten/emsdk:5.0.0
+
+  steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         submodules: recursive
-
-    - name: Setup Emscripten
-      uses: emscripten-core/emsdk@main
-      with:
-        version: 5.0.0
-        # The action automatically adds emcc/emcmake to the PATH
 
     - name: Verify Emscripten
       run: emcc -v
