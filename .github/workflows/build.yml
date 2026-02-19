@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           path: core/
@@ -71,3 +71,4 @@ jobs:
           emcmake cmake -S . -B build-wasm
           
           cmake --build build-wasm
+        working-directory: core
