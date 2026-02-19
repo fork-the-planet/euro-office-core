@@ -317,7 +317,7 @@ v8_monolithic=true
 v8_use_external_startup_data=false
 v8_enable_i18n_support=false
 v8_enable_webassembly=false
-v8_enable_pointer_compression=false
+v8_enable_pointer_compression=true
 v8_enable_sandbox=false
 
 # Disable cppgc to avoid build issues
