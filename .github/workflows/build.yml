@@ -68,7 +68,7 @@ jobs:
 
       - name: Build with Emscripten
         run: |
-          emcmake cmake -S . -B build-wasm
-          
-          cmake --build build-wasm
-        working-directory: core
+          mkdir -p ../build-wasm-dir
+          cd ../build-wasm-dir
+          /bin/bash -c "emcmake cmake -S $GITHUB_WORKSPACE/core -B . -DEO_CORE_OUTPUT_DIR=$GITHUB_WORKSPACE/package && cmake --build ."
+        shell: bash
