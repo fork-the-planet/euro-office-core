@@ -43,21 +43,21 @@ cp -r icu2/icu4c ./icu
 cp icu2/LICENSE ./
 rm -rf icu2
 
-if [ "$fetch_only" -eq 0 ]; then
-    echo "Building icu"
-    mkdir build_linux_x64 || abort_op "Failed to create build dir"
-    cd build_linux_x64
-    $work_dir/icu/source/configure \
-    --prefix="$install_dir" \
-    --enable-rpath \
-    CC=gcc \
-    CXX=g++ \
-    AR=ar \
-    RANLIB=ranlib \
-    CXXFLAGS="-static-libstdc++ -static-libgcc" \
-    LDFLAGS='-Wl,-rpath,$$ORIGIN' \
-    || abort_op "Configure failed"
+echo "Building icu"
+mkdir build_linux_x64 || abort_op "Failed to create build dir"
+cd build_linux_x64
+$work_dir/icu/source/configure \
+--prefix="$install_dir" \
+--enable-rpath \
+CC=gcc \
+CXX=g++ \
+AR=ar \
+RANLIB=ranlib \
+CXXFLAGS="-static-libstdc++ -static-libgcc" \
+LDFLAGS='-Wl,-rpath,$$ORIGIN' \
+|| abort_op "Configure failed"
 
+if [ "$fetch_only" -eq 0 ]; then
     make -j10 && make install || abort_op "Build failed"
 
     echo "ICU ready! (work dir will be removed)"
