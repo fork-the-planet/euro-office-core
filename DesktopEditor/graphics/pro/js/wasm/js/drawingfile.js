@@ -55,7 +55,7 @@ function CFile()
 	this.scannedImages = {};
 }
 
-//file_internal
+import './drawingfile_native.js';
 
 CFile.prototype.lockPageNumForFontsLoader = function(pageIndex, type)
 {

@@ -4,7 +4,7 @@ work_dir="$1"
 install_dir="$2"
 icu_major=$3
 icu_minor=$4
-platform_prefix=$5
+fetch_only=${5:-0}
 
 abort_op()
 {
@@ -57,9 +57,11 @@ CXXFLAGS="-static-libstdc++ -static-libgcc" \
 LDFLAGS='-Wl,-rpath,$$ORIGIN' \
 || abort_op "Configure failed"
 
-make -j10 && make install || abort_op "Build failed"
+if [ "$fetch_only" -eq 0 ]; then
+    make -j10 && make install || abort_op "Build failed"
 
-echo "ICU ready! (work dir will be removed)"
-rm -rf "$work_dir"
+    echo "ICU ready! (work dir will be removed)"
+    rm -rf "$work_dir"
+fi
 
 exit 0

@@ -34,10 +34,27 @@
 #include "../../../DesktopEditor/common/Directory.h"
 
 #include <vector>
+#include <string>
 
-int main()
+std::wstring GetWString(const char* s) {
+    std::string str(s);
+    return std::wstring(str.begin(), str.end());
+}
+
+int main(int argc, char* argv[])
 {
-    std::vector<std::wstring> arrFiles = NSDirectory::GetFiles(NSFile::GetProcessDirectory() + L"/../../CMap/CMap");
+
+    std::wstring sCMapPath;
+
+    // Check if a path was passed as an argument
+    if (argc > 1) {
+        sCMapPath = GetWString(argv[1]);
+    } else {
+        // Fallback to original hardcoded relative logic
+        sCMapPath = NSFile::GetProcessDirectory() + L"/../../../CMap/CMap";
+    }
+
+    std::vector<std::wstring> arrFiles = NSDirectory::GetFiles(sCMapPath);
 
     NSWasm::CData oRes;
     for (const std::wstring& sFile : arrFiles)
@@ -64,7 +81,7 @@ int main()
     }
 
     NSFile::CFileBinary oFile;
-	if (oFile.CreateFileW(NSFile::GetProcessDirectory() + L"/../cmap.bin"))
+	if (oFile.CreateFileW(NSFile::GetProcessDirectory() + L"/cmap.bin"))
     {
         oFile.WriteFile(oRes.GetBuffer(), oRes.GetSize());
         oFile.CloseFile();

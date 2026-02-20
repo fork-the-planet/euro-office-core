@@ -2,6 +2,7 @@
 
 work_dir="$1"
 install_dir="$2"
+keep_work=${3:-0}
 
 abort_op()
 {
@@ -45,7 +46,9 @@ make -j10 || abort_op "Build failed!"
 echo "Installing OpenSSL to: [$install_dir]"
 make install || abort_op "Install failed!"
 
-echo "OpenSSL ready! (work dir will be removed)"
-rm -rf "$work_dir"
+if [ "$keep_work" -eq 0 ]; then
+    echo "OpenSSL ready! (work dir will be removed)"
+    rm -rf "$work_dir"
+fi
 
 exit 0
