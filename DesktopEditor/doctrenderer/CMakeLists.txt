@@ -83,16 +83,16 @@ get_filename_component(V8_3RDPARTY_DIR_ABS "${V8_3RDPARTY_DIR}" ABSOLUTE)
 get_filename_component(V8_WORK_DIR_ABS "${V8_WORK_DIR}" ABSOLUTE)
 get_filename_component(V8_INSTALL_DIR_ABS "${V8_INSTALL_DIR}" ABSOLUTE)
 
-# Set TARGET_CPU based on detected architecture (x64 or arm64)
+# Set TARGETARCH based on detected architecture (x64 or arm64)
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
-    set(TARGET_CPU arm64)
+    set(TARGETARCH arm64)
 else()
-    set(TARGET_CPU x64)
+    set(TARGETARCH x64)
 endif()
 
 execute_process(
     COMMAND_ECHO STDOUT
-    COMMAND /bin/sh -c "export TARGET_CPU=${TARGET_CPU} && ./nc-build.sh \"${V8_WORK_DIR}\" \"${V8_INSTALL_DIR}\""
+    COMMAND /bin/sh -c "export TARGETARCH=${TARGETARCH} && ./nc-build.sh \"${V8_WORK_DIR}\" \"${V8_INSTALL_DIR}\""
     WORKING_DIRECTORY ${V8_3RDPARTY_DIR}
 )
 

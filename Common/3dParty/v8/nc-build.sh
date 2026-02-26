@@ -8,15 +8,15 @@ fi
 
 work_dir="$1"
 install_dir="$2"
-TARGET_CPU="${TARGET_CPU:-x64}"
+TARGETARCH="${TARGETARCH:-x64}"
 
-# Normalize TARGET_CPU early
-case "$TARGET_CPU" in
+# Normalize TARGETARCH early
+case "$TARGETARCH" in
   aarch64)
-    TARGET_CPU="arm64"
+    TARGETARCH="arm64"
     ;;
   x86_64|amd64)
-    TARGET_CPU="x64"
+    TARGETARCH="x64"
     ;;
 esac
 
@@ -276,7 +276,7 @@ cd "$V8_SRC"
 
 log "Using GN: $GN_BIN (version: $($GN_BIN --version 2>/dev/null || echo 'unknown'))"
 
-log "Building for TARGET_CPU: $TARGET_CPU"
+log "Building for TARGETARCH: $TARGETARCH"
 
 # ---------- Detect Clang ----------
 CLANG_PATH=$(which clang)
@@ -288,8 +288,8 @@ log "Clang version: $(clang --version | head -n1)"
 # ---------- GN ARGS ----------
 GN_ARGS="
 target_os=\"linux\"
-target_cpu=\"$TARGET_CPU\"
-v8_target_cpu=\"$TARGET_CPU\"
+target_cpu=\"$TARGETARCH\"
+v8_target_cpu=\"$TARGETARCH\"
 
 is_debug=false
 is_component_build=false
@@ -348,7 +348,7 @@ use_gold=false
 use_lld=true
 "
 
-OUTPUT_DIR="$V8_SRC/out.gn/${TARGET_CPU}.release"
+OUTPUT_DIR="$V8_SRC/out.gn/${TARGETARCH}.release"
 
 log "Resetting build directory: $OUTPUT_DIR"
 rm -rf "$OUTPUT_DIR"
