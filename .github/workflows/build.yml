@@ -35,8 +35,17 @@ jobs:
                 lsb-release \
                 libboost-all-dev
     
+    - name: Install clang-13 and other required tools
+      run: |
+        wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/llvm-snapshot.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/llvm-snapshot.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-13 main" | sudo tee /etc/apt/sources.list.d/llvm-13.list
+        sudo apt-get update && sudo apt-get install -y clang-13 lld-13
+    
     - name: Configure with CMake
-      run: cmake -GNinja -S . -B build
+      run: |
+        export CC=clang-13
+        export CXX=clang++-13
+        cmake -GNinja -S . -B build
     
     - name: Build
       run: cmake --build build
