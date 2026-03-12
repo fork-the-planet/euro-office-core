@@ -52,6 +52,8 @@ add_library(Fb2File SHARED
     ${GUMBO_INSTALL_DIR}/src/utf8.c
     ${GUMBO_INSTALL_DIR}/src/util.c
     ${GUMBO_INSTALL_DIR}/src/vector.c
+    
+    ${HTML_3RDPARTY_DIR}/htmltoxhtml.cpp
 
     ${GUMBO_INSTALL_DIR}/src/attribute.h
     ${GUMBO_INSTALL_DIR}/src/char_ref.h

@@ -135,7 +135,7 @@ add_library(DocxFormatLib STATIC
     ${OOXML_ROOT_DIR}/XlsxFormat/Pivot/PivotCacheDefinitionExt.cpp
     ${OOXML_ROOT_DIR}/XlsxFormat/Pivot/PivotHierarchies.cpp
     ${OOXML_ROOT_DIR}/XlsxFormat/Pivot/Pivots.cpp
-    ${OOXML_ROOT_DIR}/XlsxFormat/RichData/RdRichValue.cpp
+    ${OOXML_ROOT_DIR}/XlsxFormat/RichData/RdRichData.cpp
     ${OOXML_ROOT_DIR}/XlsxFormat/SharedStrings/PhoneticPr.cpp
     ${OOXML_ROOT_DIR}/XlsxFormat/SharedStrings/SharedStrings.cpp
     ${OOXML_ROOT_DIR}/XlsxFormat/SharedStrings/Si.cpp
@@ -323,7 +323,7 @@ add_library(DocxFormatLib STATIC
     ${OOXML_ROOT_DIR}/XlsxFormat/Pivot/PivotCacheRecords.h
     ${OOXML_ROOT_DIR}/XlsxFormat/Pivot/PivotHierarchies.h
     ${OOXML_ROOT_DIR}/XlsxFormat/Pivot/PivotTable.h
-    ${OOXML_ROOT_DIR}/XlsxFormat/RichData/RdRichValue.h
+    ${OOXML_ROOT_DIR}/XlsxFormat/RichData/RdRichData.h
     ${OOXML_ROOT_DIR}/XlsxFormat/SharedStrings/PhoneticPr.h
     ${OOXML_ROOT_DIR}/XlsxFormat/SharedStrings/Run.h
     ${OOXML_ROOT_DIR}/XlsxFormat/SharedStrings/SharedStrings.h
