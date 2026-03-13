@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: [ubuntu-latest, self-hosted]
+    runs-on: ubuntu-22.04
     env:
       PLEASE_PRELOAD_LIBSTDCPP: true
       CC: clang-13
