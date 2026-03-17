@@ -518,6 +518,7 @@ set(SOURCES
     ${CORE_ROOT}/PdfFile/SrcReader/RendererOutputDev.cpp
     ${CORE_ROOT}/PdfFile/SrcReader/JPXStream2.cpp
     ${CORE_ROOT}/PdfFile/SrcReader/PdfAnnot.cpp
+    ${CORE_ROOT}/PdfFile/SrcReader/PdfFont.cpp
 
     ${CORE_ROOT}/PdfFile/SrcWriter/AcroForm.cpp
     ${CORE_ROOT}/PdfFile/SrcWriter/Annotation.cpp

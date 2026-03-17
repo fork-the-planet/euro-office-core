@@ -54,10 +54,33 @@ execute_process(
 
 add_library(HtmlFile2 SHARED
     htmlfile2.cpp
+    HTMLReader.cpp
+    Table.cpp
 
+    Common.h
     htmlfile2.h
+    HTMLParameters.h
+    HTMLReader.h
+    MarkdownParameters.h
+    Table.h
     src/StringFinder.h
     src/Languages.h
+
+    # Tags
+    Tags/MDTags.cpp
+    Tags/OOXMLTags.cpp
+
+    Tags/HTMLTags.h
+    Tags/MDTags.h
+    Tags/OOXMLTags.h
+
+    # Writers
+    Writers/MDWriter.cpp
+    Writers/OOXMLWriter.cpp
+
+    Writers/IWriter.h
+    Writers/MDWriter.h
+    Writers/OOXMLWriter.h
 
     # katana.pri
     ${KATANA_INSTALL_DIR}/src/foundation.c
@@ -88,6 +111,8 @@ add_library(HtmlFile2 SHARED
     ${GUMBO_INSTALL_DIR}/src/util.c
     ${GUMBO_INSTALL_DIR}/src/vector.c
 
+    ${HTML_3RDPARTY_DIR}/htmltoxhtml.cpp
+
     ${GUMBO_INSTALL_DIR}/src/attribute.h
     ${GUMBO_INSTALL_DIR}/src/char_ref.h
     ${GUMBO_INSTALL_DIR}/src/error.h
@@ -106,6 +131,8 @@ add_library(HtmlFile2 SHARED
     ${GUMBO_INSTALL_DIR}/src/utf8.h
     ${GUMBO_INSTALL_DIR}/src/util.h
     ${GUMBO_INSTALL_DIR}/src/vector.h
+
+    ${HTML_3RDPARTY_DIR}/htmltoxhtml.h
 
     # CssCalculator.pri
     ${HTML_3RDPARTY_DIR}/css/src/CCompiledStyle.cpp
@@ -153,6 +180,7 @@ target_include_directories(HtmlFile2 PRIVATE
     ${HTML_3RDPARTY_DIR}
     ${HTML_3RDPARTY_DIR}/css # CssCalculator.pri
     ${GUMBO_INSTALL_DIR_ABS}/src
+    ${KATANA_INSTALL_DIR_ABS}/src
 )
 
 target_compile_definitions(HtmlFile2 PRIVATE

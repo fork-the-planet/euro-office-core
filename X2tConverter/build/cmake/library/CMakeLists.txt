@@ -116,7 +116,13 @@ if(NOT TARGET HWPFile)
     add_subdirectory(${CORE_ROOT_DIR}/HwpFile HWPFile)
 endif()
 
+if(NOT TARGET StarMathConverter)
+    add_subdirectory(${CORE_ROOT_DIR}/OdfFile/Reader/Converter/StarMath2OOXML StarMathConverter)
+endif()
 
+if(NOT TARGET ooxmlsignature)
+    add_subdirectory(${CORE_ROOT_DIR}/DesktopEditor/xmlsec/src ooxmlsignature)
+endif()
 
 message( "Fetch and build icu (x2t_lib)" )
 set(ICU_3RDPARTY_DIR "${CORE_ROOT_DIR}/Common/3dParty/icu")
@@ -227,6 +233,8 @@ target_link_libraries(x2tlib PUBLIC
     DocxRenderer
     IWorkFile
     HWPFile
+    StarMathConverter
+    ooxmlsignature
     ${ICU_INSTALL_DIR_ABS}/lib/libicuuc.so.${ICU_MAJOR_VER}
     ${ICU_INSTALL_DIR_ABS}/lib/libicudata.so.${ICU_MAJOR_VER}
 )

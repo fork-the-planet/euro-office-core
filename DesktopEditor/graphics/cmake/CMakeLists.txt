@@ -1048,6 +1048,7 @@ endif()
 
 target_include_directories(graphics PRIVATE
     ${EO_CORE_3RD_PARTY_INSTALL_DIR}
+    ${KATANA_INSTALL_DIR_ABS}/src
 	${DESKTOP_EDITOR_ROOT_DIR}/agg-2.4/include
     ${DESKTOP_EDITOR_ROOT_DIR}/cximage/jasper/include
 	${DESKTOP_EDITOR_ROOT_DIR}/cximage/jpeg

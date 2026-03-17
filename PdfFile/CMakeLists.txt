@@ -249,12 +249,14 @@ add_library(PdfFile SHARED
     SrcReader/RendererOutputDev.cpp
     SrcReader/Adaptors.cpp
     SrcReader/PdfAnnot.cpp
+    SrcReader/PdfFont.cpp
     SrcReader/GfxClip.cpp
 
     SrcReader/RendererOutputDev.h
     SrcReader/Adaptors.h
     SrcReader/MemoryUtils.h
     SrcReader/PdfAnnot.h
+    SrcReader/PdfFont.h
     SrcReader/GfxClip.h
 
     # Base fonts

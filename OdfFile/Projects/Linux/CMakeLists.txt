@@ -49,6 +49,7 @@ add_library(OdfFormatLib STATIC
     ${SM_CUSTOM_SHAPE_2_OOXML_DIR}/customshape.cpp
 
     ${STAR_MATH_2_OOXML_DIR}/cconversionsmtoooxml.cpp
+    ${STAR_MATH_2_OOXML_DIR}/conversionmathformula.cpp
     ${STAR_MATH_2_OOXML_DIR}/cooxml2odf.cpp
     ${STAR_MATH_2_OOXML_DIR}/cstarmathpars.cpp
 
@@ -455,9 +456,12 @@ add_library(OdfFormatLib STATIC
     ${SM_CUSTOM_SHAPE_2_OOXML_DIR}/customshape.h
 
     ${STAR_MATH_2_OOXML_DIR}/cconversionsmtoooxml.h
+    ${STAR_MATH_2_OOXML_DIR}/conversionmathformula.h
     ${STAR_MATH_2_OOXML_DIR}/cooxml2odf.h
     ${STAR_MATH_2_OOXML_DIR}/cstarmathpars.h
     ${STAR_MATH_2_OOXML_DIR}/fontType.h
+    ${STAR_MATH_2_OOXML_DIR}/TextDirection.h
+    ${STAR_MATH_2_OOXML_DIR}/TFormulaSize.h
     ${STAR_MATH_2_OOXML_DIR}/typeConversion.h
     ${STAR_MATH_2_OOXML_DIR}/typeselements.h
 )
