@@ -63,15 +63,13 @@ jobs:
 
     - name: Configure with CMake, build third_party libs (icu, v8, etc.)
       run: |
-        mkdir -p /build-cache
-        cd /build-cache
         cmake -GNinja \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_CXX_FLAGS_RELEASE="-O3 -w" \
           -DCMAKE_C_FLAGS_RELEASE="-O3 -w" \
           -DEO_CORE_OUTPUT_DIR=/package/bin \
           -DEO_CORE_TOOLS_DIR=/package/tools \
-          $GITHUB_WORKSPACE
+          .
 
     - name: Build
       run: cmake --build build
@@ -79,7 +77,6 @@ jobs:
     - name: Conversion Test
       run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester ../../../build/package
       run: |
-        cd /build-cache
         cmake --build .
 # 2. WebAssembly Build
   build-wasm:
