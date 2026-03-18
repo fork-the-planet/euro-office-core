@@ -61,19 +61,53 @@ jobs:
         sudo update-alternatives --install /usr/bin/llvm-ranlib llvm-ranlib /usr/bin/llvm-ranlib-13 100 || true
         sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-13 100 || true
 
-    - name: Configure with CMake (uses CC/CXX env vars)
+    - name: Configure with CMake, build third_party libs (icu, v8, etc.)
       run: |
+        mkdir -p /build-cache
+        cd /build-cache
         cmake -GNinja \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_CXX_FLAGS_RELEASE="-O3 -w" \
           -DCMAKE_C_FLAGS_RELEASE="-O3 -w" \
           -DEO_CORE_OUTPUT_DIR=/package/bin \
           -DEO_CORE_TOOLS_DIR=/package/tools \
-          .
-        cmake --build .
+          $GITHUB_WORKSPACE
 
     - name: Build
       run: cmake --build build
 
     - name: Conversion Test
       run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester ../../../build/package
+      run: |
+        cd /build-cache
+        cmake --build .
+# 2. WebAssembly Build
+  build-wasm:
+    runs-on: [ubuntu-latest, self-hosted]
+    container:
+        image: emscripten/emsdk:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          path: core/
+
+      - name: Checkout sdkjs repository
+        uses: actions/checkout@v6
+        with:
+          repository: euro-office/sdkjs
+          ref: fork
+          path: sdkjs/
+          token: ${{ secrets.EURO_OFFICE_MIRROR_TOKEN }}
+
+      - name: Verify Emscripten
+        run: emcc -v
+
+      - name: Build with Emscripten
+        run: |
+          mkdir -p ../build-wasm-dir
+          cd ../build-wasm-dir
+          /bin/bash -c "emcmake cmake -S $GITHUB_WORKSPACE/core -B . -DEO_CORE_OUTPUT_DIR=$GITHUB_WORKSPACE/package && cmake --build ."
+        shell: bash
