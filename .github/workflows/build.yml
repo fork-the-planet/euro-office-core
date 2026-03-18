@@ -63,8 +63,15 @@ jobs:
 
     - name: Configure with CMake (uses CC/CXX env vars)
       run: |
-        cmake -GNinja -S . -B build
-        
+        cmake -GNinja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_CXX_FLAGS_RELEASE="-O3 -w" \
+          -DCMAKE_C_FLAGS_RELEASE="-O3 -w" \
+          -DEO_CORE_OUTPUT_DIR=/package/bin \
+          -DEO_CORE_TOOLS_DIR=/package/tools \
+          .
+        cmake --build .
+
     - name: Build
       run: cmake --build build
 
