@@ -60,7 +60,10 @@ jobs:
         sudo update-alternatives --install /usr/bin/llvm-nm llvm-nm /usr/bin/llvm-nm-13 100 || true
         sudo update-alternatives --install /usr/bin/llvm-ranlib llvm-ranlib /usr/bin/llvm-ranlib-13 100 || true
         sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-13 100 || true
-
+    - name: Verify clang version
+      run: |
+        clang-13 --version
+        clang --version
     - name: Configure core, build third_party libs (ICU, V8, etc.)
       run: |
         cmake -GNinja \
