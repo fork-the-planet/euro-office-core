@@ -45,13 +45,23 @@ jobs:
             libc++-13-dev libc++abi-13-dev \
             qemu-user-static binfmt-support
         
-        # Ensure alternatives are set for clang/llvm if available
+        # Ensure alternatives are set for clang/llvm 
         sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 100
         sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-13 100
         sudo update-alternatives --install /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-13 100
         sudo update-alternatives --install /usr/bin/llvm-nm llvm-nm /usr/bin/llvm-nm-13 100
         sudo update-alternatives --install /usr/bin/llvm-ranlib llvm-ranlib /usr/bin/llvm-ranlib-13 100
         sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-13 100
+
+        # Explicitly select clang version 13 as default,
+        # because clang version 18 might also be available and 
+        # might be the default on the system.
+        sudo update-alternatives --set clang /usr/bin/clang-13
+        sudo update-alternatives --set clang++ /usr/bin/clang++-13
+        sudo update-alternatives --set lld /usr/bin/lld-13
+        sudo update-alternatives --set llvm-ar /usr/bin/llvm-ar-13
+        sudo update-alternatives --set llvm-nm /usr/bin/llvm-nm-13
+        sudo update-alternatives --set llvm-ranlib /usr/bin/llvm-ranlib-13
     - name: Verify clang version
       run: |
         set -euo pipefail
