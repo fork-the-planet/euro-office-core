@@ -61,7 +61,7 @@ jobs:
         sudo update-alternatives --install /usr/bin/llvm-ranlib llvm-ranlib /usr/bin/llvm-ranlib-13 100 || true
         sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-13 100 || true
 
-    - name: Configure with CMake, build third_party libs (icu, v8, etc.)
+    - name: Configure core, build third_party libs (ICU, V8, etc.)
       run: |
         cmake -GNinja \
           -DCMAKE_BUILD_TYPE=Release \
@@ -76,6 +76,7 @@ jobs:
 
     - name: Conversion Test
       run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester ../../../build/package
+    - name: Build core (x2t, docbuilder, etc.)
       run: |
         cmake --build .
 # 2. WebAssembly Build

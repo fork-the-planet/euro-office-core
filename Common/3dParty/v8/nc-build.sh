@@ -279,11 +279,34 @@ log "Using GN: $GN_BIN (version: $($GN_BIN --version 2>/dev/null || echo 'unknow
 log "Building for TARGETARCH: $TARGETARCH"
 
 # ---------- Detect Clang ----------
-CLANG_PATH=$(which clang)
+if [ -n "$CC" ] && command -v "$CC" >/dev/null 2>&1; then
+  CLANG_CMD="$CC"
+elif command -v clang-13 >/dev/null 2>&1; then
+  CLANG_CMD="clang-13"
+elif command -v clang >/dev/null 2>&1; then
+  CLANG_CMD="clang"
+else
+  abort_op "clang not found - install clang-13 or clang"
+fi
+
+if [ -n "$CXX" ] && command -v "$CXX" >/dev/null 2>&1; then
+  CXX_CMD="$CXX"
+elif command -v clang++-13 >/dev/null 2>&1; then
+  CXX_CMD="clang++-13"
+elif command -v clang++ >/dev/null 2>&1; then
+  CXX_CMD="clang++"
+else
+  abort_op "clang++ not found - install clang++-13 or clang++"
+fi
+
+CLANG_PATH=$(command -v "$CLANG_CMD")
 CLANG_DIR=$(dirname "$(dirname "$CLANG_PATH")")
 
+export CC="$CLANG_CMD"
+export CXX="$CXX_CMD"
+
 log "Detected Clang at: $CLANG_DIR"
-log "Clang version: $(clang --version | head -n1)"
+log "Clang version: $($CC --version | head -n1)"
 
 # ---------- GN ARGS ----------
 GN_ARGS="
@@ -300,8 +323,8 @@ clang_base_path=\"$CLANG_DIR\"
 clang_use_chrome_plugins=false
 
 # Explicit compiler paths
-cc=\"clang\"
-cxx=\"clang++\"
+cc="${CC}"
+cxx="${CXX}"
 
 use_sysroot=false
 use_custom_libcxx=false
@@ -371,12 +394,11 @@ log "Building v8_monolith..."
 export AR=llvm-ar
 export NM=llvm-nm
 export RANLIB=llvm-ranlib
-export CC=clang
-export CXX=clang++
+# keep CC/CXX from earlier detection
 export SHELL=/bin/bash
 
 # Verify tools exist
-for tool in llvm-ar llvm-nm llvm-ranlib clang clang++; do
+for tool in llvm-ar llvm-nm llvm-ranlib "$CC" "$CXX"; do
   if ! command -v $tool &> /dev/null; then
     abort_op "$tool not found - install llvm and clang"
   fi
