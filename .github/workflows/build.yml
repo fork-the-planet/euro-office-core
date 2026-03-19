@@ -88,4 +88,4 @@ jobs:
         cmake --build build
 
     - name: Conversion Test
-      run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester build/package
+      run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester ../../../build/package
