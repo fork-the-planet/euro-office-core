@@ -323,8 +323,8 @@ clang_base_path=\"$CLANG_DIR\"
 clang_use_chrome_plugins=false
 
 # Explicit compiler paths
-cc="${CC}"
-cxx="${CXX}"
+cc=\"${CC}\"
+cxx=\"${CXX}\"
 
 use_sysroot=false
 use_custom_libcxx=false
