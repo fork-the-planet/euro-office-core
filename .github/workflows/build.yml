@@ -84,14 +84,12 @@ jobs:
           -DEO_CORE_TOOLS_DIR=$GITHUB_WORKSPACE/package/tools \
           .
 
-    - name: Build
-      run: cmake --build build
-
-    - name: Conversion Test
-      run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester ../../../build/package
     - name: Build core (x2t, docbuilder, etc.)
       run: |
         cmake --build .
+
+    - name: Conversion Test
+      run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester $GITHUB_WORKSPACE/package
 # 2. WebAssembly Build
   build-wasm:
     runs-on: [ubuntu-latest, self-hosted]
