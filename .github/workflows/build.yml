@@ -45,25 +45,25 @@ jobs:
             libc++-13-dev libc++abi-13-dev \
             qemu-user-static binfmt-support
         
-        # Create symlinks so V8 build script can find clang-13 and LLVM toolchain
-        sudo ln -sf /usr/bin/clang-13 /usr/bin/clang
-        sudo ln -sf /usr/bin/clang++-13 /usr/bin/clang++
-        sudo ln -sf /usr/bin/lld-13 /usr/bin/lld
-        sudo ln -sf /usr/bin/llvm-ar-13 /usr/bin/llvm-ar
-        sudo ln -sf /usr/bin/llvm-nm-13 /usr/bin/llvm-nm
-        sudo ln -sf /usr/bin/llvm-ranlib-13 /usr/bin/llvm-ranlib
-
         # Ensure alternatives are set for clang/llvm if available
-        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 100 || true
-        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-13 100 || true
-        sudo update-alternatives --install /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-13 100 || true
-        sudo update-alternatives --install /usr/bin/llvm-nm llvm-nm /usr/bin/llvm-nm-13 100 || true
-        sudo update-alternatives --install /usr/bin/llvm-ranlib llvm-ranlib /usr/bin/llvm-ranlib-13 100 || true
-        sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-13 100 || true
+        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 100
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-13 100
+        sudo update-alternatives --install /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-13 100
+        sudo update-alternatives --install /usr/bin/llvm-nm llvm-nm /usr/bin/llvm-nm-13 100
+        sudo update-alternatives --install /usr/bin/llvm-ranlib llvm-ranlib /usr/bin/llvm-ranlib-13 100
+        sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-13 100
     - name: Verify clang version
       run: |
+        set -euo pipefail
+
         clang-13 --version
         clang --version
+
+        # strict checks
+        clang-13 --version | head -n1 | grep -qE 'clang version 13' || { echo "clang-13 is not 13"; exit 1; }
+        clang --version  | head -n1 | grep -qE 'clang version 13' || { echo "clang is not 13"; exit 1; }
+
+        echo "clang and clang-13 are both v13"
     - name: Configure core, build third_party libs (ICU, V8, etc.)
       run: |
         cmake -GNinja \
