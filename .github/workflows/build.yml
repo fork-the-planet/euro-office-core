@@ -80,8 +80,8 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_CXX_FLAGS_RELEASE="-O3 -w" \
           -DCMAKE_C_FLAGS_RELEASE="-O3 -w" \
-          -DEO_CORE_OUTPUT_DIR=/package/bin \
-          -DEO_CORE_TOOLS_DIR=/package/tools \
+          -DEO_CORE_OUTPUT_DIR=$GITHUB_WORKSPACE/package/bin \
+          -DEO_CORE_TOOLS_DIR=$GITHUB_WORKSPACE/package/tools \
           .
 
     - name: Build
