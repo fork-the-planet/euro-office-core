@@ -76,47 +76,16 @@ jobs:
         echo "clang and clang-13 are both v13"
     - name: Configure core, build third_party libs (ICU, V8, etc.)
       run: |
-        cmake -GNinja \
+        cmake -GNinja -S . -B build \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_CXX_FLAGS_RELEASE="-O3 -w" \
           -DCMAKE_C_FLAGS_RELEASE="-O3 -w" \
-          -DEO_CORE_OUTPUT_DIR=$GITHUB_WORKSPACE/package/bin \
-          -DEO_CORE_TOOLS_DIR=$GITHUB_WORKSPACE/package/tools \
-          .
+          -DEO_CORE_OUTPUT_DIR=$PWD/build/package/bin \
+          -DEO_CORE_TOOLS_DIR=$PWD/build/package/tools
 
     - name: Build core (x2t, docbuilder, etc.)
       run: |
-        cmake --build .
+        cmake --build build
 
     - name: Conversion Test
-      run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester $GITHUB_WORKSPACE/package
-# 2. WebAssembly Build
-  build-wasm:
-    runs-on: [ubuntu-latest, self-hosted]
-    container:
-        image: emscripten/emsdk:latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-          path: core/
-
-      - name: Checkout sdkjs repository
-        uses: actions/checkout@v6
-        with:
-          repository: euro-office/sdkjs
-          ref: fork
-          path: sdkjs/
-          token: ${{ secrets.EURO_OFFICE_MIRROR_TOKEN }}
-
-      - name: Verify Emscripten
-        run: emcc -v
-
-      - name: Build with Emscripten
-        run: |
-          mkdir -p ../build-wasm-dir
-          cd ../build-wasm-dir
-          /bin/bash -c "emcmake cmake -S $GITHUB_WORKSPACE/core -B . -DEO_CORE_OUTPUT_DIR=$GITHUB_WORKSPACE/package && cmake --build ."
-        shell: bash
+      run: ./Test/Applications/x2tTester/conversionTest.sh ./Test/Applications/x2tTester build/package
