@@ -76,12 +76,7 @@ jobs:
         echo "clang and clang-13 are both v13"
     - name: Configure core, build third_party libs (ICU, V8, etc.)
       run: |
-        cmake -GNinja -S . -B build \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_CXX_FLAGS_RELEASE="-O3 -w" \
-          -DCMAKE_C_FLAGS_RELEASE="-O3 -w" \
-          -DEO_CORE_OUTPUT_DIR=$PWD/build/package/bin \
-          -DEO_CORE_TOOLS_DIR=$PWD/build/package/tools
+        cmake -GNinja -S . -B build
 
     - name: Build core (x2t, docbuilder, etc.)
       run: |
