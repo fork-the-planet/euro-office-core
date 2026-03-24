@@ -82,9 +82,17 @@ set(V8_INSTALL_DIR "${EO_CORE_3RD_PARTY_INSTALL_DIR}/v8")
 get_filename_component(V8_3RDPARTY_DIR_ABS "${V8_3RDPARTY_DIR}" ABSOLUTE)
 get_filename_component(V8_WORK_DIR_ABS "${V8_WORK_DIR}" ABSOLUTE)
 get_filename_component(V8_INSTALL_DIR_ABS "${V8_INSTALL_DIR}" ABSOLUTE)
+
+# Set TARGETARCH based on detected architecture (x64 or arm64)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+    set(TARGETARCH arm64)
+else()
+    set(TARGETARCH x64)
+endif()
+
 execute_process(
     COMMAND_ECHO STDOUT
-    COMMAND ./nc-build.sh "${V8_WORK_DIR}" "${V8_INSTALL_DIR}"
+    COMMAND /bin/sh -c "export TARGETARCH=${TARGETARCH} && ./nc-build.sh \"${V8_WORK_DIR}\" \"${V8_INSTALL_DIR}\""
     WORKING_DIRECTORY ${V8_3RDPARTY_DIR}
 )
 

@@ -17,8 +17,6 @@ if(EMSCRIPTEN)
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/graphics/pro/js/" drawingfile )
 else()
 
-    add_compile_options(-march=native)
-
     add_subdirectory( "${CORE_ROOT_DIR}/X2tConverter/build/cmake" x2t )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/AllFontsGen" allfontsgen )
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/allthemesgen" allthemesgen )
