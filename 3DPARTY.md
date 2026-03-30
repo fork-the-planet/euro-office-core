@@ -16,3 +16,7 @@
 - cryptopp ([BSL](https://raw.githubusercontent.com/weidai11/cryptopp/master/License.txt))
 - openssl ([Apache-2.0](https://raw.githubusercontent.com/openssl/openssl/master/LICENSE.txt))
 - v8 ([3-clause BSD License](https://raw.githubusercontent.com/v8/v8/main/LICENSE))
+- POLE ([BSD-3-Clause](https://raw.githubusercontent.com/ArtifexSoftware/pole/master/LICENSE))
+- SocketRocket ([Apache-2.0](https://raw.githubusercontent.com/Flipboard/SocketRocket/master/LICENSE))
+- IXWebSocket ([BSD-3-Clause](https://raw.githubusercontent.com/machinezone/IXWebSocket/master/LICENSE))
+- GLEW ([BSD/MIT](https://raw.githubusercontent.com/nigels-com/glew/master/LICENSE.txt))
