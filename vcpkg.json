@@ -14,7 +14,7 @@
         "cef",
         "qt"
       ]
-    },
+    }
   },
   "overrides": [
     { "name": "hunspell", "version": "1.7.2" }
