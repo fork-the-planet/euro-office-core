@@ -28,10 +28,9 @@ jobs:
       - name: Checkout sdkjs repository
         uses: actions/checkout@v6
         with:
-          repository: euro-office/sdkjs
+          repository: Euro-Office/sdkjs
           ref: main
           path: sdkjs/
-          token: ${{ secrets.EURO_OFFICE_MIRROR_TOKEN }}
 
       - name: Verify Emscripten
         run: emcc -v
