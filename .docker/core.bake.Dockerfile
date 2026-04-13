@@ -76,16 +76,25 @@ FROM vcpkg-${NUGET_CACHE} AS core-base
     ENV DEBIAN_FRONTEND=noninteractive
     ENV PLEASE_PRELOAD_LIBSTDCPP=true
 
+    # cmake from ubuntu noble is 3.28.x; vcpkg now requires >=4.x.
+    # Install cmake 4.x from Kitware's apt repo here (after vcpkg bootstrap)
+    # so the vcpkg-base git-clone+bootstrap layer remains cacheable even when
+    # GitHub CDN is unreachable in network-restricted build environments.
     RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
         apt-get update && \
         DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            git curl sudo wget ssh \
-            build-essential make cmake ninja-build pkg-config \
+            git curl sudo wget ssh gpg \
+            build-essential make ninja-build pkg-config \
             libglib2.0-dev \
             python3 python-is-python3 python3-venv python3-setuptools \
             python3-httplib2 \
             lsb-release libboost-all-dev findutils \
             gn \
+        && curl -fsSL https://apt.kitware.com/keys/kitware-archive-latest.asc \
+            | gpg --dearmor -o /etc/apt/keyrings/kitware.gpg \
+        && echo "deb [signed-by=/etc/apt/keyrings/kitware.gpg] https://apt.kitware.com/ubuntu/ noble main" \
+            > /etc/apt/sources.list.d/kitware.list \
+        && apt-get update && apt-get install -y cmake \
         && rm -rf /var/lib/apt/lists/*
 
     # clang-13 required for V8 9.x — only available on jammy (22.04), not noble (24.04)
