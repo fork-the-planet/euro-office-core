@@ -102,17 +102,10 @@ AscFonts.AllocString = function(size)
 	return new CShapeString(size);
 };
 
-AscFonts.FT_CreateLibrary = Module["_ASC_FT_Init"];
-AscFonts.FT_Done_Library = Module["_ASC_FT_Done_FreeType"];
-AscFonts.FT_Set_TrueType_HintProp = Module["_ASC_FT_Set_TrueType_HintProp"];
-
-AscFonts.FT_Open_Face = Module["_ASC_FT_Open_Face"];
-AscFonts.FT_Done_Face = Module["_ASC_FT_Done_Face"];
-AscFonts.FT_SetCMapForCharCode = Module["_ASC_FT_SetCMapForCharCode"];
-AscFonts.FT_GetKerningX = Module["_ASC_FT_GetKerningX"];
-AscFonts.FT_GetFaceMaxAdvanceX = Module["_ASC_FT_GetFaceMaxAdvanceX"];
-AscFonts.FT_Set_Transform = Module["_ASC_FT_Set_Transform"];
-AscFonts.FT_Set_Char_Size = Module["_ASC_FT_Set_Char_Size"];
+// NOTE: AscFonts.FT_* direct assignments moved to Module.onRuntimeInitialized
+// below, because newer Emscripten no longer generates lazy stubs — the
+// Module["_xxx"] references are undefined at file scope and only become real
+// functions once the WASM instance is ready.
 AscFonts.FT_GetFaceInfo = function(face, reader)
 {
 	let pointer = Module["_ASC_FT_GetFaceInfo"](face);
@@ -130,8 +123,7 @@ AscFonts.FT_GetFaceInfo = function(face, reader)
 	return g_return_obj;
 };
 
-AscFonts.FT_Load_Glyph = Module["_ASC_FT_Load_Glyph"];
-AscFonts.FT_SetCMapForCharCode = Module["_ASC_FT_SetCMapForCharCode"];
+// (AscFonts.FT_Load_Glyph and FT_SetCMapForCharCode also set in onRuntimeInitialized)
 AscFonts.FT_Get_Glyph_Measure_Params = function(face, vector_worker, reader)
 {
 	let pointer = Module["_ASC_FT_Get_Glyph_Measure_Params"](face, vector_worker ? 1 : 0);
@@ -173,7 +165,7 @@ AscFonts.FT_Get_Glyph_Render_Buffer = function(face, size)
 };
 
 let hb_cache_languages = {};
-AscFonts.HB_FontFree = Module["ASC_HB_FontFree"];
+// (AscFonts.HB_FontFree also set in onRuntimeInitialized)
 AscFonts.HB_ShapeText = function(fontFile, text, features, script, direction, language, reader)
 {
 	if (!hb_cache_languages[language])
@@ -643,10 +635,25 @@ AscFonts.Hyphen_Word = function(lang, word)
 if (window["NATIVE_EDITOR_ENJINE"])
 	window.immediateRun();
 
-AscFonts.onLoadModule();
+AscFonts.onLoadModule();  // count = 1 (WASM not yet ready)
 
 Module.onRuntimeInitialized = function () {
-  AscFonts.onLoadModule();
+	// WASM is fully loaded — Module["_xxx"] are now real functions.
+	// Assign them here so engine.js's onLoadFontsModule always sees real values,
+	// regardless of whether Emscripten uses lazy stubs (old) or not (new).
+	AscFonts.FT_CreateLibrary         = Module["_ASC_FT_Init"];
+	AscFonts.FT_Done_Library          = Module["_ASC_FT_Done_FreeType"];
+	AscFonts.FT_Set_TrueType_HintProp = Module["_ASC_FT_Set_TrueType_HintProp"];
+	AscFonts.FT_Open_Face             = Module["_ASC_FT_Open_Face"];
+	AscFonts.FT_Done_Face             = Module["_ASC_FT_Done_Face"];
+	AscFonts.FT_SetCMapForCharCode    = Module["_ASC_FT_SetCMapForCharCode"];
+	AscFonts.FT_GetKerningX           = Module["_ASC_FT_GetKerningX"];
+	AscFonts.FT_GetFaceMaxAdvanceX    = Module["_ASC_FT_GetFaceMaxAdvanceX"];
+	AscFonts.FT_Set_Transform         = Module["_ASC_FT_Set_Transform"];
+	AscFonts.FT_Set_Char_Size         = Module["_ASC_FT_Set_Char_Size"];
+	AscFonts.FT_Load_Glyph            = Module["_ASC_FT_Load_Glyph"];
+	AscFonts.HB_FontFree              = Module["ASC_HB_FontFree"];
+	AscFonts.onLoadModule();  // count = 2 → triggers onLoadFontsModule in engine.js
 };
 
 })(window, undefined);
