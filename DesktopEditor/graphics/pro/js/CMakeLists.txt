@@ -1041,7 +1041,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
 -sWASM=1
 -sASSERTIONS=0
 -sEXPORTED_FUNCTIONS=[${EXPORTED_FUNCS_STR}]
-#-sEXPORTED_RUNTIME_METHODS=HEAP8,HEAPU8,HEAP32,noExitRuntime,print,printErr
+-sEXPORTED_RUNTIME_METHODS=HEAP8,HEAPU8,HEAP32,noExitRuntime,print,printErr
 "-sLEGACY_VM_SUPPORT=1"
 "SHELL:--pre-js ${CORE_ROOT}/Common/js/string_utf8.js"
 "SHELL:--pre-js ${CORE_ROOT}/Common/js/desktop_fetch_new.js"
