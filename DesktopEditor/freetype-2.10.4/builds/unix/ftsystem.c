@@ -24,6 +24,7 @@
 #include <freetype/fterrors.h>
 #include <freetype/fttypes.h>
 #include <freetype/internal/ftstream.h>
+#include <fcntl.h>
 
   /* memory-mapping includes and definitions */
 #ifdef HAVE_UNISTD_H
