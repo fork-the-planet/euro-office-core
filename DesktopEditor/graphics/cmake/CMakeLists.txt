@@ -1038,6 +1038,8 @@ target_compile_definitions(graphics PRIVATE
     HAVE_FREETYPE
     HB_NO_VISIBILITY
 
+    _lseek=lseek
+
     # brotli.pri
     FT_CONFIG_OPTION_USE_BROTLI
 )
