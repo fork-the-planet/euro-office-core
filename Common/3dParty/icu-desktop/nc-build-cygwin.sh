@@ -31,8 +31,13 @@ fi
   --enable-shared \
   --disable-static || abort_op "Configuration failed"
 
+
+# Fix bug with older icu versions
+mkdir -p data/out/tmp data/out/build
+
+
 # Build and install
-make -j$(nproc) || abort_op "Build failed"
+make -j$(nproc) || make -j1 || abort_op "Build failed"
 make install || abort_op "Install failed"
 
 # ---------------------------------------------------------------------------

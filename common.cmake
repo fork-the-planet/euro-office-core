@@ -94,9 +94,9 @@ if( EMSCRIPTEN )
 
 else()
 
-    if(NOT THIRD_PARTY_PREPARED)
+    if( THIRD_PARTY_PREPARED)
         if(NOT BUILD_DESKTOP)
-            set(NO_DESKTOP_EXCLUDE ",icu-desktop")
+            set(NO_DESKTOP_EXCLUDE ",cef,qt,icu-desktop")
         endif()
 
         cmake_path( APPEND BUILDER_PATH "${CMAKE_CURRENT_LIST_DIR}" "Common" "3dParty" "build_3rdparty.py" )
@@ -104,7 +104,7 @@ else()
             COMMAND_ECHO STDOUT
             COMMAND "${PYTHON_BIN}"
             "${BUILDER_PATH}"
-            "--except=openssl-hash,icu-wasm,cef,qt${NO_DESKTOP_EXCLUDE}" # cef and qt need old build environment, cannot be built here
+            "--except=openssl-hash,icu-wasm${NO_DESKTOP_EXCLUDE}" # cef and qt need old build environment, cannot be built here
             "${EO_CORE_3RD_PARTY_WORK_DIR}" "${EO_CORE_3RD_PARTY_INSTALL_DIR}"
             RESULT_VARIABLE result
             OUTPUT_VARIABLE output
@@ -122,7 +122,7 @@ else()
     endif()
 
     if(MSVC)
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "" FORCE)
         foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_C_FLAGS CMAKE_C_FLAGS_RELEASE)
             string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
         endforeach()
@@ -136,8 +136,9 @@ else()
         set(ICU_DESKTOP_INSTALL_DIR "${EO_CORE_3RD_PARTY_INSTALL_DIR}/icu-desktop")
         get_filename_component(ICU_DESKTOP_INSTALL_DIR_ABS "${ICU_DESKTOP_INSTALL_DIR}" ABSOLUTE)
         if( MSVC )
-            set(LIBICUUC_DESKTOP "${ICU_DESKTOP_INSTALL_DIR_ABS}/lib/icuuc.lib")
+            set(LIBICUUC_DESKTOP   "${ICU_DESKTOP_INSTALL_DIR_ABS}/lib/icuuc.lib")
             set(LIBICUDATA_DESKTOP "${ICU_DESKTOP_INSTALL_DIR_ABS}/lib/icudt.lib")
+            set(LIBICUI_DESKTOP    "${ICU_DESKTOP_INSTALL_DIR_ABS}/lib/icuin.lib")
         else()
             set(LIBICUUC_DESKTOP "${ICU_DESKTOP_INSTALL_DIR_ABS}/lib/libicuuc.so.${ICU_DESKTOP_MAJOR_VER}")
             set(LIBICUDATA_DESKTOP "${ICU_DESKTOP_INSTALL_DIR_ABS}/lib/libicudata.so.${ICU_DESKTOP_MAJOR_VER}")
@@ -176,7 +177,7 @@ else()
     # Setup boost
     set( BOOST_INSTALL_DIR "${EO_CORE_3RD_PARTY_INSTALL_DIR}/boost" )
     get_filename_component(BOOST_INSTALL_DIR_ABS "${BOOST_INSTALL_DIR}" ABSOLUTE)
-    set( CMAKE_PREFIX_PATH "${BOOST_INSTALL_DIR_ABS}" )
+    list( APPEND CMAKE_PREFIX_PATH "${BOOST_INSTALL_DIR_ABS}" )
     include_directories( "${BOOST_INSTALL_DIR_ABS}/include" )
     set(Boost_USE_STATIC_LIBS ON)
     find_package( Boost REQUIRED COMPONENTS system filesystem regex date_time )
