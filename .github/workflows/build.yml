@@ -171,15 +171,24 @@ jobs:
         ARG NIGHTLY_IMAGE
         FROM ${NIGHTLY_IMAGE}
         COPY . /tmp/core/
-        # The install path is brand-derived (/var/www/<brand>/documentserver);
-        # locate it via the sdkjs dir, then overlay the FileConverter binaries,
-        # tools and shared libraries (mirrors bundle.bake.Dockerfile).
-        RUN set -eux; \
+        # The CI build emits a flat build/package (binaries, tools and .so libs
+        # together), unlike the bake which splits bin/tools. Rather than assume a
+        # layout, overlay by filename: replace each same-named file already present
+        # in the image's server tree (FileConverter/bin, FileConverter/lib,
+        # server/tools). Fail if nothing matched, so a layout drift can't silently
+        # pass. The install path is brand-derived; locate it via the sdkjs dir.
+        RUN set -eu; \
             root="$(dirname "$(find /var/www -maxdepth 5 -type d -name sdkjs -path '*documentserver*' | head -n1)")"; \
             test -n "$root"; \
-            cp -a /tmp/core/bin/.   "$root/server/FileConverter/bin/"; \
-            cp -a /tmp/core/tools/. "$root/server/tools/"; \
-            for f in /tmp/core/*.so*; do [ -e "$f" ] && cp -a "$f" "$root/server/FileConverter/lib/"; done; \
+            count=0; \
+            for f in $(find /tmp/core -type f); do \
+              name="$(basename "$f")"; \
+              for t in $(find "$root/server" -type f -name "$name"); do \
+                cp -af "$f" "$t"; count=$((count+1)); echo "overlaid $name -> $t"; \
+              done; \
+            done; \
+            echo "total files replaced: $count"; \
+            [ "$count" -gt 0 ]; \
             rm -rf /tmp/core
         EOF
         docker build \
