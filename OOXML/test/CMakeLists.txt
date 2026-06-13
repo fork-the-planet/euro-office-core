@@ -54,6 +54,15 @@ target_compile_definitions(ooxml_test PRIVATE
     BUILD_X2T_AS_LIBRARY_DYLIB
 )
 
+# main.cpp/common.{h,cpp} include core headers with paths anchored at the
+# X2tConverter.pri location (e.g. "../../../OOXML/Base/Base.h",
+# "../../src/dylib/x2t.h"). In the qmake build those resolved against the .pri's
+# directory; reproduce that here by adding it as an include dir so the same
+# relative includes resolve under CMake.
+target_include_directories(ooxml_test PRIVATE
+    "${CORE_ROOT_DIR}/X2tConverter/build/Qt"
+)
+
 # Stage the committed conversion fixtures and make sure the deep working
 # directory exists before the test runs.
 add_custom_command(TARGET ooxml_test POST_BUILD
