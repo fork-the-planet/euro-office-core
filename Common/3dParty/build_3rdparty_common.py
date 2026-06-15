@@ -229,8 +229,8 @@ class MeasurementObj:
 # the old manual check (build locally only).
 # ===========================================================================
 
-NEXTCLOUD_USER   = os.environ.get( "NEXTCLOUD_USER", "hendrik" )
-NEXTCLOUD_PASS   = os.environ.get( "NEXTCLOUD_PASS", "Jerzq-SYAfp-btwZQ-9QpGc-X3dCf" )
+NEXTCLOUD_USER   = os.environ.get( "NEXTCLOUD_USER", "" )
+NEXTCLOUD_PASS   = os.environ.get( "NEXTCLOUD_PASS", "" )
 NEXTCLOUD_REMOTE = "https://cloud.nextcloud.com/remote.php/dav/files"
 BASE_REMOTE_PATH = "3DPARTY_DEPS_1"
 # Keep OS/arch builds apart on the remote, e.g. "linux-x86_64", "win32-AMD64".

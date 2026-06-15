@@ -1,24 +1,40 @@
 #!/usr/bin/env python3
 import sys
 import shutil
-import os
 import time
-import subprocess
+import json
+import tarfile
+import urllib.request
+import urllib.parse
 from pathlib import Path
 
 script_path = Path(sys.argv[0]).resolve()
 script_dir = script_path.parent
 
-cef_branch = "5414"
-cef_checkout = "f1c41e4b1392ef8816171c4d51a2fca308db5501"
-automate_git_url = "https://raw.githubusercontent.com/chromiumembedded/cef/master/tools/automate/automate-git.py"
+# --- Prebuilt CEF (Spotify automated builds) configuration --------------------
+# We no longer build CEF from source; we download a prebuilt binary distribution
+# from https://cef-builds.spotifycdn.com/ instead.
+#
+#   cef_index_url      : JSON manifest of every available build / platform.
+#   cef_download_base  : where the .tar.bz2 archives live.
+#   cef_channel        : "stable" or "beta".
+#   cef_distrib_type   : "minimal" (release binaries + headers + libcef_dll_wrapper,
+#                        no debug build / sample apps), "standard" (adds debug +
+#                        cefclient/cefsimple), "client", etc.
+#   cef_version        : pin an EXACT build for reproducibility, e.g.
+#                        "114.4.1+g7c3f9a0+chromium-114.0.5735.134"
+#                        Leave as None to auto-pick the newest build for the
+#                        Chromium major below.
+#   cef_chromium_major : only used when cef_version is None. The old source build
+#                        tracked CEF branch 5414, i.e. the Chromium 114.x line.
+cef_index_url = "https://cef-builds.spotifycdn.com/index.json"
+cef_download_base = "https://cef-builds.spotifycdn.com/"
+cef_channel = "stable"
+cef_distrib_type = "minimal"
+cef_version = "109.1.18+gf1c41e4+chromium-109.0.5414.120"
+cef_chromium_major = None
 
-gn_defines = ( "is_official_build=true use_sysroot=true symbol_level=0 "
-               "is_cfi=false use_thin_lto=true use_vaapi=false "
-               "use_gtk=true use_dbus=true use_partition_alloc_as_malloc=false" )
-
-max_gclient_retries = 20
-max_recovery_tries = 3
+max_download_retries = 5
 
 third_party_root = ( script_dir / ".." ).resolve()
 if str( third_party_root ) not in sys.path:
@@ -33,118 +49,117 @@ nc.init_for_dep(
     forceredo = len(sys.argv) > 3 and sys.argv[3] == "force-redo"
 )
 
-automate_dir = nc.work_dir / "automate"
-download_dir = nc.work_dir / "chromium_git"
+download_dir = nc.work_dir / "download"
+
+
+def cef_platform():
+    if sys.platform.startswith( "win" ):
+        return "windows64"
+    if sys.platform.startswith( "linux" ):
+        return "linux64"
+    nc.abort_op( f"Unsupported platform for prebuilt CEF: {sys.platform}" )
+
+
+def _version_key( entry ):
+    parts = []
+    for p in entry.get( "chromium_version", "0" ).split( "." ):
+        parts.append( int( p ) if p.isdigit() else 0 )
+    return parts
+
+
+def resolve_build():
+    """Pick a (cef_version, archive_filename) from the Spotify build index."""
+    platform = cef_platform()
+    print( f"Fetching CEF build index for {platform} ..." )
+
+    req = urllib.request.Request( cef_index_url, headers = { "User-Agent": "cef-fetch" } )
+    with urllib.request.urlopen( req ) as resp:
+        index = json.load( resp )
+
+    versions = index.get( platform, {} ).get( "versions", [] )
+    if not versions:
+        nc.abort_op( f"No CEF builds listed for platform '{platform}'" )
+
+    if cef_version:
+        chosen = next( ( v for v in versions if v.get( "cef_version" ) == cef_version ), None )
+        if chosen is None:
+            nc.abort_op( f"Pinned CEF version '{cef_version}' not found for '{platform}'" )
+    else:
+        candidates = [
+            v for v in versions
+            if v.get( "channel", "stable" ) == cef_channel
+            and v.get( "chromium_version", "" ).split( "." )[0] == cef_chromium_major
+        ]
+        if not candidates:
+            print( f"!!! No '{cef_channel}' build for Chromium {cef_chromium_major}; "
+                   f"falling back to newest '{cef_channel}' build." )
+            candidates = [ v for v in versions if v.get( "channel", "stable" ) == cef_channel ]
+        if not candidates:
+            nc.abort_op( f"No '{cef_channel}' CEF builds available for '{platform}'" )
+        chosen = max( candidates, key = _version_key )
+
+    files = chosen.get( "files", [] )
+    match = next( ( f for f in files if f.get( "type" ) == cef_distrib_type ), None )
+    if match is None:
+        available = ", ".join( sorted( { f.get( "type", "?" ) for f in files } ) )
+        nc.abort_op( f"No '{cef_distrib_type}' distrib for {chosen.get('cef_version')}. "
+                     f"Available types: {available}" )
+
+    return chosen.get( "cef_version" ), match["name"]
+
+
+def download( url, dest ):
+    for attempt in range( 1, max_download_retries + 1 ):
+        try:
+            req = urllib.request.Request( url, headers = { "User-Agent": "cef-fetch" } )
+            with urllib.request.urlopen( req ) as resp, open( dest, "wb" ) as out:
+                shutil.copyfileobj( resp, out )
+            return
+        except Exception as e:
+            if attempt == max_download_retries:
+                nc.abort_op( f"Download failed after {max_download_retries} attempts: {e}" )
+            print( f"Download failed (attempt {attempt}/{max_download_retries}): {e}. "
+                   "Retrying in 10 seconds..." )
+            time.sleep( 10 )
 
 
 def fetch_and_patch():
     nc.create_workdir()
-
-    automate_dir.mkdir( parents = True, exist_ok = True )
     download_dir.mkdir( parents = True, exist_ok = True )
 
-    nc.run_command(
-        [ "wget", automate_git_url, "-O", str( automate_dir / "automate-git.py" ) ],
-        "Download automate-git.py",
-        automate_dir
-    )
+    version, file_name = resolve_build()
+    url = cef_download_base + urllib.parse.quote( file_name )
+    archive = download_dir / file_name
+
+    print( f"Downloading prebuilt CEF {version} ({cef_distrib_type})" )
+    print( f"  {url}" )
+    download( url, archive )
+
+    print( "Extracting binary distribution ..." )
+    with tarfile.open( archive, "r:bz2" ) as tar:
+        try:
+            tar.extractall( download_dir, filter = "data" )  # Python 3.12+
+        except TypeError:
+            tar.extractall( download_dir )
 
     nc.create_work_dir_ok_marker()
     print( "Fetch & patch completed" )
 
 
-def setup_build_env():
-    os.environ["LANG"] = "en_US.UTF-8"
-    os.environ["LC_ALL"] = "en_US.UTF-8"
-    os.environ["GN_DEFINES"] = gn_defines
-    os.environ["CEF_ARCHIVE_FORMAT"] = "tar.bz2"
-
-
-def run_gclient_recovery():
-    print( "!!! automate-git.py failed. Attempting to recover via gclient sync..." )
-
-    # automate-git.py downloads depot_tools inside the download dir.
-    # Add it to PATH so we can use 'gclient'.
-    depot_tools_dir = download_dir / "depot_tools"
-    os.environ["PATH"] = os.environ["PATH"] + os.pathsep + str( depot_tools_dir )
-
-    chromium_dir = download_dir / "chromium"
-
-    retry_count = 0
-    while True:
-        result = subprocess.run(
-            [ "gclient", "sync", "--force", "--reset",
-              "--with_branch_heads", "--with_tags" ],
-            cwd = chromium_dir
-        )
-        if result.returncode == 0:
-            break
-        retry_count += 1
-        if retry_count > max_gclient_retries:
-            nc.abort_op( f"Failed to sync after {max_gclient_retries} attempts" )
-        print( f"gclient sync failed (Attempt {retry_count}/{max_gclient_retries}). "
-               "Retrying in 10 seconds..." )
-        time.sleep( 10 )
-
-    print( "!!! gclient sync succeeded. Resuming build..." )
-
-    shutil.rmtree( download_dir / "cef", ignore_errors = True )
-    shutil.rmtree( depot_tools_dir, ignore_errors = True )
-
-
-def run_automate_git():
-    # Not using nc.run_command here because failure is expected and
-    # handled by the recovery loop instead of aborting.
-    result = subprocess.run(
-        [   sys.executable,
-            str( automate_dir / "automate-git.py" ),
-            f"--download-dir={download_dir}",
-            f"--checkout={cef_checkout}",
-            f"--branch={cef_branch}",
-            "--minimal-distrib",
-            "--client-distrib",
-            "--force-clean",
-            "--no-chromium-history",
-            "--build-target=cefsimple",
-            "--x64-build",
-            "--with-pgo-profiles"
-        ],
-        cwd = automate_dir
-    )
-    return result.returncode == 0
-
-
 def find_binary_distrib_dir():
-    binary_distrib = download_dir / "chromium" / "src" / "cef" / "binary_distrib"
-    matches = sorted( binary_distrib.glob( "cef_binary_*_linux64" ) )
+    matches = sorted( download_dir.glob( f"cef_binary_*_{cef_platform()}*" ) )
     if not matches:
-        nc.abort_op( f"No cef_binary_*_linux64 found in {binary_distrib}" )
+        nc.abort_op( f"No extracted cef_binary_* directory found in {download_dir}" )
     return matches[0]
+
 
 def build_and_install():
     nc.create_install_dir()
 
-    setup_build_env()
-
-    # Main build loop: if automate-git.py fails, run gclient recovery and
-    # retry. After max_recovery_tries failed recoveries, wipe the chromium
-    # checkout entirely and start over.
-    recovery_count = 0
-    while True:
-        if run_automate_git():
-            print( "Build completed successfully!" )
-            break
-        run_gclient_recovery()
-        recovery_count += 1
-        if recovery_count > max_recovery_tries:
-            print( "!!! Too many failed recoveries. Wiping chromium checkout..." )
-            shutil.rmtree( download_dir / "chromium", ignore_errors = True )
-            recovery_count = 0
-
     cef_binary_dir = find_binary_distrib_dir()
 
     # Copy the binary distribution into the install dir
-    target_dir = nc.install_dir / f"cef"
+    target_dir = nc.install_dir
     try:
         if target_dir.exists():
             shutil.rmtree( target_dir )

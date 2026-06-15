@@ -94,7 +94,7 @@ if( EMSCRIPTEN )
 
 else()
 
-    if( THIRD_PARTY_PREPARED)
+    if(NOT THIRD_PARTY_PREPARED)
         if(NOT BUILD_DESKTOP)
             set(NO_DESKTOP_EXCLUDE ",cef,qt,icu-desktop")
         endif()
