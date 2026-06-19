@@ -33,5 +33,10 @@ FROM emscripten/emsdk:5.0.4 AS core-wasm
                       -DEO_CORE_OUTPUT_DIR=/build-cache-wasm/dist /core
         cmake --build . -- -j$(nproc)
         ccache --show-stats
+        echo "=== CCACHE ON DISK ==="
+        du -sh /ccache || true
+        find /ccache -type f | wc -l || true
+        echo "=== EM CACHE ON DISK ==="
+        du -sh /em-cache || true
         cp -a /build-cache-wasm/dist/. ${BUILD_ROOT}/
 EOF
