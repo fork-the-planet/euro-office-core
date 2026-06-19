@@ -10,10 +10,6 @@ FROM ubuntu:18.04 AS third-party-builder
         wget \
         tar \
         curl \
-        file \
-        lsb-release \
-        procps \
-        git \
         python3 \
         python3-pip \
         pkg-config \
@@ -40,22 +36,6 @@ FROM ubuntu:18.04 AS third-party-builder
         libcups2-dev \
         libgtk-3-dev \
         libxcomposite-dev \
-        libx11-xcb-dev \
-        libxrender-dev \
-        libxrandr-dev \
-        libxinerama-dev \
-        libxcursor-dev \
-        libgirepository1.0-dev \
-        libcairo2-dev \
-        libnss3-dev \
-        libgnome-keyring-dev \
-        libgbm-dev \
-        gperf \
-        locales \
-        uuid-dev \
-        libcurl4-openssl-dev \
-        libkrb5-dev \
-        libpci-dev \
         && ln -s /usr/bin/python3 /usr/bin/python \
         && rm -rf /var/lib/apt/lists/*
 
@@ -72,17 +52,6 @@ FROM ubuntu:18.04 AS third-party-builder
         cd .. && rm -rf Python-3.10.13* && \
         python3.10 --version
 
-    RUN apt-get update && apt-get install -y sudo && \
-        curl 'https://chromium.googlesource.com/chromium/src/+/refs/tags/109.0.5414.120/build/install-build-deps.sh?format=TEXT' \
-            | base64 -d > install-build-deps.sh && \
-        chmod +x install-build-deps.sh && \
-        ./install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl --no-prompt && \
-        python3 -m pip install dataclasses importlib_metadata && \
-        locale-gen en_US.UTF-8 && \
-        update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
-        rm -rf /var/lib/apt/lists/*
-
-
     COPY /core/Common/3dParty /3dParty
 
 
@@ -91,7 +60,7 @@ FROM ubuntu:18.04 AS third-party-builder
         export NEXTCLOUD_USER="$(cat /run/secrets/nextcloud_user)" && \
         export NEXTCLOUD_PASS="$(cat /run/secrets/nextcloud_pass)" && \
         python3.10 /3dParty/build_3rdparty.py \
-            --only=qt,cef \
+            --only=qt \
             /third_party/work \
             /third_party/install
 
