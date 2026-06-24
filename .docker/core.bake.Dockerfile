@@ -90,7 +90,7 @@ FROM vcpkg-${NUGET_CACHE} AS core-base
     RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
         apt-get update && \
         DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            git curl sudo wget ssh gpg \
+            git curl sudo wget ssh gpg ccache \
             build-essential make ninja-build pkg-config \
             libglib2.0-dev \
             python3 python-is-python3 python3-venv python3-setuptools \
