@@ -80,6 +80,10 @@ Done:
       output file, so the post-conversion comparisons fail. The CTest run is disabled
       (`set_tests_properties(ooxml_test PROPERTIES DISABLED TRUE)`) pending diagnosis of the headless
       conversion by someone able to run X2T locally.
+- [x] `OfficeUtils/tests` — deps: kernel, UnicodeConverter. The committed `tests/zip/`
+      fixtures are staged next to the binary: the suite resolves fixtures relative to the
+      process directory (`<binary dir>/../zip`), and writes its `unzip`/`temp` output dirs
+      alongside (under the build tree, so writable).
 
 ### gtest suites to migrate
 
@@ -87,8 +91,6 @@ Runnable headless once migrated (no missing fixtures, no JS engine):
 
 - [ ] `OdfFile/Reader/Converter/StarMath2OOXML/TestSMCustomShape` — dep: StarMathConverter
       (confirm sources exist).
-- [ ] `OfficeUtils/tests` — deps: kernel, UnicodeConverter. Fixtures committed under
-      `tests/zip/` (stage next to binary).
 - [ ] `OdfFile/Test/test_odf` — OdfFormatLib dependency chain; own `main`. Fixtures
       committed under `test_odf/ExampleFiles/`.
 

@@ -36,6 +36,7 @@ else()
         add_subdirectory( "${CORE_ROOT_DIR}/OdfFile/Reader/Converter/StarMath2OOXML/TestSMConverter" starmath_smconverter_test )
         add_subdirectory( "${CORE_ROOT_DIR}/OdfFile/Reader/Converter/StarMath2OOXML/TestEQNtoOOXML" starmath_eqntoooxml_test )
         add_subdirectory( "${CORE_ROOT_DIR}/OOXML/test" ooxml_test )
+        add_subdirectory( "${CORE_ROOT_DIR}/OfficeUtils/tests" officeutils_test )
     endif()
 
 endif()
